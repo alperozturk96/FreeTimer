@@ -11,8 +11,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -32,6 +34,7 @@ fun HomeView(
     showCountDownTimer: () -> Unit,
 ) {
     val context = LocalContext.current
+    val focusRequester = remember { FocusRequester() }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -53,7 +56,10 @@ fun HomeView(
         })
 
         Button(onClick = {
-            if (checkTimerValue(setCount) && checkTimerValue(workoutDuration) && checkTimerValue(restDuration)) {
+            if (checkTimerValue(setCount) && checkTimerValue(workoutDuration) && checkTimerValue(
+                    restDuration
+                )
+            ) {
                 showCountDownTimer()
             } else {
                 Toast.makeText(context, "Please enter valid timer value", Toast.LENGTH_SHORT).show()
@@ -85,7 +91,10 @@ private fun TimerInput(value: String, label: String, onValueChange: (String) -> 
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = TextStyle(color = Color.Black, fontWeight = FontWeight.Normal),
         maxLines = 1,
-        value = value,
-        onValueChange = { onValueChange(it) },
+        value = value.replace(Regex("[^0-9]"), ""),
+        onValueChange = {
+            val sanitizedValue = it.replace(Regex("[^0-9]"), "")
+            onValueChange(sanitizedValue)
+        },
         label = { Text(label, color = Color.Black) })
 }
