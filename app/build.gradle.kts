@@ -59,9 +59,6 @@ dependencies {
     implementation ("androidx.compose.ui:ui-graphics")
     implementation ("androidx.compose.ui:ui-tooling-preview")
 
-    // WorkManager
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-
     // Material3
     implementation ("androidx.compose.material3:material3:1.1.1")
     implementation ("androidx.compose.material3:material3-window-size-class:1.1.1")

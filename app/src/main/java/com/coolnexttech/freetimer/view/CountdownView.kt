@@ -1,8 +1,8 @@
 package com.coolnexttech.freetimer.view
 
-import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +37,11 @@ fun CountDownView(setCountValue: Int, workoutDurationValue: Int, restDurationVal
     var setCount by remember { mutableIntStateOf(setCountValue) }
     var workoutDuration by remember { mutableIntStateOf(workoutDurationValue) }
     var restDuration by remember { mutableIntStateOf(restDurationValue) }
+
+    BackHandler {
+        musicPlayer.stopAudio()
+        finishTraining()
+    }
 
     Handler(Looper.getMainLooper()).postDelayed({
         if (isRestModeActive) {

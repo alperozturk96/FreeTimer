@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.coolnexttech.freetimer.util.TimerWorker
+import com.coolnexttech.freetimer.ui.theme.BorderColor
 
 @Composable
 fun HomeView(
@@ -58,7 +59,7 @@ fun HomeView(
                 Toast.makeText(context, "Please enter valid timer value", Toast.LENGTH_SHORT).show()
             }
         }) {
-            Text(text = "Start Timer")
+            Text(text = "Start Timer", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -76,10 +77,15 @@ private fun checkTimerValue(input: String): Boolean {
 
 @Composable
 private fun TimerInput(value: String, label: String, onValueChange: (String) -> Unit) {
-    OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+    OutlinedTextField(
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.Black,
+            unfocusedBorderColor = BorderColor,
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = TextStyle(color = Color.Black, fontWeight = FontWeight.Normal),
         maxLines = 1,
         value = value,
         onValueChange = { onValueChange(it) },
-        label = { Text(label) })
+        label = { Text(label, color = Color.Black) })
 }
