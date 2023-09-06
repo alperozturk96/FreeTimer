@@ -11,10 +11,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -34,7 +32,6 @@ fun HomeView(
     showCountDownTimer: () -> Unit,
 ) {
     val context = LocalContext.current
-    val focusRequester = remember { FocusRequester() }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -82,7 +79,11 @@ private fun checkTimerValue(input: String): Boolean {
 }
 
 @Composable
-private fun TimerInput(value: String, label: String, onValueChange: (String) -> Unit) {
+private fun TimerInput(
+    value: String,
+    label: String,
+    onValueChange: (String) -> Unit
+) {
     OutlinedTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Black,
