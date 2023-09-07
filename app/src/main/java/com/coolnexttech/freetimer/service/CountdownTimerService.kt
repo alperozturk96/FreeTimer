@@ -33,10 +33,6 @@ class CountdownTimerService: Service() {
         startForeground(1, notification)
     }
 
-    private fun stop() {
-
-    }
-
     enum class Actions {
         Start, Stop
     }
