@@ -3,7 +3,9 @@ package com.coolnexttech.freetimer.service
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import androidx.core.app.NotificationCompat
 import com.coolnexttech.freetimer.R
 
@@ -28,6 +30,12 @@ class CountdownTimerService: Service() {
             Actions.Stop.toString() -> stopSelf()
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    fun tick(second: Int, action: () -> Unit) {
+        Handler(Looper.getMainLooper()).postDelayed({
+           action()
+        }, second.toLong() * 1000)
     }
 
     private fun start() {

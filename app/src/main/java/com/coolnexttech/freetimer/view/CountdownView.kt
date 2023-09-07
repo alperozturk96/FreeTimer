@@ -35,7 +35,7 @@ import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
 fun CountDownView(
-    countdownTimerService: CountdownTimerService,
+    service: CountdownTimerService,
     setCountValue: Int,
     workoutDurationValue: Int,
     restDurationValue: Int,
@@ -55,7 +55,7 @@ fun CountDownView(
         finishTraining()
     }
 
-    Handler(Looper.getMainLooper()).postDelayed({
+    service.tick(1) {
         if (isRestModeActive) {
             restDuration -= 1
 
@@ -79,7 +79,7 @@ fun CountDownView(
                 isRestModeActive = true
             }
         }
-    }, 1000)
+    }
 
     val timeLeft = if (isRestModeActive) {
         "Rest: $restDuration"
