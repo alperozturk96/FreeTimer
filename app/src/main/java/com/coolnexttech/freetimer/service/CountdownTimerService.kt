@@ -2,6 +2,7 @@ package com.coolnexttech.freetimer.service
 
 import android.app.Service
 import android.content.Intent
+import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.coolnexttech.freetimer.R
@@ -12,8 +13,13 @@ class CountdownTimerService: Service() {
         const val notificationId = 1
     }
 
+    private val binder = LocalBinder()
+    inner class LocalBinder : Binder() {
+        fun getService(): CountdownTimerService = this@CountdownTimerService
+    }
+
     override fun onBind(intent: Intent?): IBinder? {
-        return null
+        return binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

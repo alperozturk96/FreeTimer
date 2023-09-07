@@ -35,6 +35,7 @@ import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
 fun CountDownView(
+    countdownTimerService: CountdownTimerService,
     setCountValue: Int,
     workoutDurationValue: Int,
     restDurationValue: Int,
