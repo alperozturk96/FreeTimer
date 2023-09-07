@@ -77,27 +77,23 @@ fun CountDownView(
         }
     }, 1000)
 
+    val timeLeft = if (isRestModeActive) {
+        "Rest: $restDuration"
+    } else {
+        "Time Left: $workoutDuration"
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Spacer(modifier = Modifier.weight(1f))
-
         InfoText(text = "SET: $setCount")
-
-        InfoText(
-            text = if (isRestModeActive) {
-                "Rest: $restDuration"
-            } else {
-                "Time Left: $workoutDuration"
-            }
-        )
-
+        InfoText(text = timeLeft)
         Spacer(modifier = Modifier.weight(1f))
     }
 }
-
 
 @Composable
 private fun InfoText(text: String) {
