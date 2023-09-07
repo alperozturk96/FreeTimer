@@ -13,7 +13,7 @@ class FreeTimer : Application() {
         val channel = NotificationChannel(
             CountdownTimerService.countdownTimerServiceId,
             "FreeTimer",
-            NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_DEFAULT
         )
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

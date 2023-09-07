@@ -1,5 +1,6 @@
 package com.coolnexttech.freetimer.view
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
@@ -27,7 +28,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
 import com.coolnexttech.freetimer.R
+import com.coolnexttech.freetimer.service.CountdownTimerService
 import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
@@ -83,6 +86,8 @@ fun CountDownView(
         "Time Left: $workoutDuration"
     }
 
+    updateNotification(context, timeLeft)
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -93,6 +98,21 @@ fun CountDownView(
         InfoText(text = timeLeft)
         Spacer(modifier = Modifier.weight(1f))
     }
+}
+
+private fun updateNotification(context: Context, timeLeft: String) {
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notification = NotificationCompat.Builder(
+        context,
+        CountdownTimerService.countdownTimerServiceId
+    )
+        .setSilent(true)
+        .setSmallIcon(R.drawable.im_timer)
+        .setContentTitle(timeLeft)
+        .build()
+
+    notificationManager.notify(CountdownTimerService.notificationId, notification)
 }
 
 @Composable

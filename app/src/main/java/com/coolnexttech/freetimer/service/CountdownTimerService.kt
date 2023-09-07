@@ -9,6 +9,7 @@ import com.coolnexttech.freetimer.R
 class CountdownTimerService: Service() {
     companion object {
         const val countdownTimerServiceId = "countdownTimerService"
+        const val notificationId = 1
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -25,12 +26,11 @@ class CountdownTimerService: Service() {
 
     private fun start() {
         val notification = NotificationCompat.Builder(this, countdownTimerServiceId)
+            .setSilent(true)
             .setSmallIcon(R.drawable.im_timer)
-            .setContentTitle("FreeTimer")
-            .setContentText("Time Left: X")
             .build()
 
-        startForeground(1, notification)
+        startForeground(notificationId, notification)
     }
 
     enum class Actions {
