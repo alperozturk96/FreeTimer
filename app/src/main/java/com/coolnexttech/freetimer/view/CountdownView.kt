@@ -1,5 +1,6 @@
 package com.coolnexttech.freetimer.view
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.compose.BackHandler
@@ -29,8 +30,14 @@ import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
-fun CountDownView(setCountValue: Int, workoutDurationValue: Int, restDurationValue: Int, finishTraining: () -> Unit) {
-    val musicPlayer = MusicPlayer(context = LocalContext.current)
+fun CountDownView(
+    setCountValue: Int,
+    workoutDurationValue: Int,
+    restDurationValue: Int,
+    finishTraining: () -> Unit
+) {
+    val context: Context = LocalContext.current
+    val musicPlayer = MusicPlayer(context)
 
     var isRestModeActive by remember { mutableStateOf(false) }
 
@@ -52,6 +59,7 @@ fun CountDownView(setCountValue: Int, workoutDurationValue: Int, restDurationVal
                 isRestModeActive = false
                 workoutDuration = workoutDurationValue
                 restDuration = restDurationValue
+                musicPlayer.playAudio(R.raw.boxing_bell)
 
                 if (setCount == 0) {
                     musicPlayer.stopAudio()
@@ -77,7 +85,13 @@ fun CountDownView(setCountValue: Int, workoutDurationValue: Int, restDurationVal
 
         InfoText(text = "SET: $setCount")
 
-        InfoText(text = if (isRestModeActive) {"Rest: $restDuration"} else {"Time Left: $workoutDuration"})
+        InfoText(
+            text = if (isRestModeActive) {
+                "Rest: $restDuration"
+            } else {
+                "Time Left: $workoutDuration"
+            }
+        )
 
         Spacer(modifier = Modifier.weight(1f))
     }
