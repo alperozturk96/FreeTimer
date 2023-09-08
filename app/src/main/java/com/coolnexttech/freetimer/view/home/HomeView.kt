@@ -1,5 +1,7 @@
 package com.coolnexttech.freetimer.view.home
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +12,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,11 +29,13 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
 import com.coolnexttech.freetimer.ui.theme.BorderColor
+import com.coolnexttech.freetimer.viewmodel.HomeViewModel
 import com.google.gson.Gson
 
 @Composable
-fun HomeView(navController: NavHostController) {
-    var workoutData by remember { mutableStateOf(WorkoutData(0, 0, 0)) }
+fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
+    val workoutData: WorkoutData by viewModel.workoutData.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -39,25 +45,33 @@ fun HomeView(navController: NavHostController) {
         Spacer(modifier = Modifier.weight(1f))
 
         TimerInput(label = "Set Count", onValueChange = {
-            workoutData = workoutData.copy(setCount = it)
+            workoutData.setCount = it
         })
 
         TimerInput(label = "Workout Duration In Second", onValueChange = {
-            workoutData = workoutData.copy(workDuration = it)
+            workoutData.workDuration = it
         })
 
         TimerInput(label = "Rest Duration In Second", onValueChange = {
-            workoutData = workoutData.copy(restDuration = it)
+            workoutData.restDuration = it
         })
 
         Button(onClick = {
-            val json = Gson().toJson(workoutData)
-            navController.navigate(Destinations.CountDown + "/" + json)
+           navigateToCountDownView(workoutData, context, navController)
         }) {
             Text(text = "Start Timer", color = Color.Black)
         }
 
         Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+private fun navigateToCountDownView(workoutData: WorkoutData, context: Context, navController: NavHostController) {
+    if (workoutData.isValid()) {
+        val json = Gson().toJson(workoutData)
+        navController.navigate(Destinations.CountDown + "/" + json)
+    } else {
+        Toast.makeText(context, "Please enter valid workout duration", Toast.LENGTH_SHORT).show()
     }
 }
 

@@ -2,8 +2,6 @@ package com.coolnexttech.freetimer.view.countdown
 
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,10 +12,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,46 +26,37 @@ import androidx.core.app.NotificationCompat
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
-import com.coolnexttech.freetimer.util.MusicPlayer
+import com.coolnexttech.freetimer.navigation.Destinations
+import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 
 @Composable
-fun CountDownView(navController: NavHostController, initialWorkoutData: WorkoutData) {
-    val initialWorkoutDuration = initialWorkoutData.workDuration
-    val initialRestDuration = initialWorkoutData.restDuration
-
-    var workoutData by remember { mutableStateOf(initialWorkoutData) }
-    var isRestModeActive by remember { mutableStateOf(false) }
-
+fun CountDownView(navController: NavHostController, viewModel: CountDownViewModel, initialWorkoutData: WorkoutData) {
     val context: Context = LocalContext.current
-    val musicPlayer = MusicPlayer(context)
 
-    Handler(Looper.getMainLooper()).postDelayed({
-        if (isRestModeActive) {
-            workoutData = workoutData.copy(restDuration = workoutData.restDuration - 1)
+    val workoutData by viewModel.workoutData.collectAsState()
+    val isRestModeActive by viewModel.isRestModeActive.collectAsState()
+    val isTrainingCompleted by viewModel.isTrainingCompleted.collectAsState()
 
-            if (workoutData.restDuration == 0) {
-                workoutData = workoutData.copy(setCount = workoutData.setCount - 1)
-                isRestModeActive = false
-                workoutData = workoutData.copy(workDuration = initialWorkoutDuration)
-                workoutData = workoutData.copy(restDuration = initialRestDuration)
-                musicPlayer.playAudio(R.raw.boxing_bell)
+    DisposableEffect(Unit) {
+        viewModel.init(initialWorkoutData, context)
+        onDispose {
 
-                if (workoutData.setCount == 0) {
-                    musicPlayer.stopAudio()
-                    navController.popBackStack()
-                }
-            }
-        } else {
-            workoutData = workoutData.copy(workDuration = workoutData.workDuration - 1)
-
-            if (workoutData.workDuration == 0) {
-                musicPlayer.playAudio(R.raw.boxing_bell)
-                isRestModeActive = true
-            }
         }
-    }, 1000)
+    }
+
+    if (isTrainingCompleted) {
+        navigateBackToHome(navController)
+    }
 
     CountDownViewState(workoutData, isRestModeActive)
+}
+
+private fun navigateBackToHome(navController: NavHostController) {
+    navController.navigate(Destinations.Home) {
+        popUpTo(Destinations.Home){
+            inclusive = true
+        }
+    }
 }
 
 @Composable
