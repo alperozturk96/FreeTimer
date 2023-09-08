@@ -1,6 +1,5 @@
 package com.coolnexttech.freetimer.view
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +10,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,16 +25,11 @@ import com.coolnexttech.freetimer.ui.theme.BorderColor
 
 @Composable
 fun HomeView(
-    setCount: String,
-    workoutDuration: String,
-    restDuration: String,
-    setSetCount: (String) -> Unit,
-    setWorkoutDuration: (String) -> Unit,
-    setRestDuration: (String) -> Unit,
+    setSetCount: (Int) -> Unit,
+    setWorkoutDuration: (Int) -> Unit,
+    setRestDuration: (Int) -> Unit,
     showCountDownTimer: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -40,27 +37,20 @@ fun HomeView(
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        TimerInput(value = setCount, label = "Set Count", onValueChange = {
+        TimerInput(label = "Set Count", onValueChange = {
             setSetCount(it)
         })
 
-        TimerInput(value = workoutDuration, label = "Workout Duration In Second", onValueChange = {
+        TimerInput(label = "Workout Duration In Second", onValueChange = {
             setWorkoutDuration(it)
         })
 
-        TimerInput(value = restDuration, label = "Rest Duration In Second", onValueChange = {
+        TimerInput(label = "Rest Duration In Second", onValueChange = {
             setRestDuration(it)
         })
 
         Button(onClick = {
-            if (checkTimerValue(setCount) && checkTimerValue(workoutDuration) && checkTimerValue(
-                    restDuration
-                )
-            ) {
-                showCountDownTimer()
-            } else {
-                Toast.makeText(context, "Please enter valid timer value", Toast.LENGTH_SHORT).show()
-            }
+            showCountDownTimer()
         }) {
             Text(text = "Start Timer", color = Color.Black)
         }
@@ -69,21 +59,15 @@ fun HomeView(
     }
 }
 
-private fun checkTimerValue(input: String): Boolean {
-    return try {
-        input.toInt()
-        true
-    } catch (e: NumberFormatException) {
-        false
-    }
-}
-
 @Composable
 private fun TimerInput(
-    value: String,
     label: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (Int) -> Unit
 ) {
+    var text by remember {
+        mutableStateOf("")
+    }
+
     OutlinedTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Black,
@@ -92,10 +76,15 @@ private fun TimerInput(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         textStyle = TextStyle(color = Color.Black, fontWeight = FontWeight.Normal),
         maxLines = 1,
-        value = value.replace(Regex("[^0-9]"), ""),
-        onValueChange = {
-            val sanitizedValue = it.replace(Regex("[^0-9]"), "")
-            onValueChange(sanitizedValue)
+        value = text,
+        onValueChange = { value ->
+            if (value.length <= 2) {
+                val sanitizedValue = value.replace(Regex("[^0-9]"), "")
+                text = sanitizedValue.filter { it.isDigit() }
+                try {
+                    onValueChange(sanitizedValue.toInt())
+                } catch (_: Throwable) { }
+            }
         },
         label = { Text(label, color = Color.Black) })
 }

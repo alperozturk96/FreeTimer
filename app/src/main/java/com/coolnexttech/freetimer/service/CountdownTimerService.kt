@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
-import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -17,6 +16,10 @@ class CountdownTimerService: Service() {
         const val channelId = "countdownTimerNotificationChannelId"
         const val notificationId = 1
     }
+
+    private var setCount: Int = 0
+    private var workoutDuration: Int = 0
+    private var restDuration: Int = 0
 
     override fun onBind(intent: Intent?): IBinder? {
         return null

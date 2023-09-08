@@ -2,8 +2,6 @@ package com.coolnexttech.freetimer.view
 
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
-import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.compose.BackHandler

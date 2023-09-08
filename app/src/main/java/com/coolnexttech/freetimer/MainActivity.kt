@@ -1,21 +1,16 @@
 package com.coolnexttech.freetimer
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
-import android.os.PowerManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,16 +29,16 @@ class MainActivity : ComponentActivity() {
             askNotificationPermission(this)
 
             var showCountDownTimer by remember { mutableStateOf(false) }
-            var setCount by remember { mutableStateOf("") }
-            var workoutDuration by remember { mutableStateOf("") }
-            var restDuration by remember { mutableStateOf("") }
+            var setCount by remember { mutableIntStateOf(0) }
+            var workoutDuration by remember { mutableIntStateOf(0) }
+            var restDuration by remember { mutableIntStateOf(0) }
 
             FreeTimerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     if (!showCountDownTimer) {
-                        HomeView(setCount, workoutDuration, restDuration, setSetCount = {
+                        HomeView(setSetCount = {
                             setCount = it
                         }, setWorkoutDuration = {
                             workoutDuration = it
@@ -58,9 +53,9 @@ class MainActivity : ComponentActivity() {
                         })
                     } else {
                         CountDownView(
-                            setCountValue = setCount.toInt(),
-                            workoutDurationValue = workoutDuration.toInt(),
-                            restDurationValue = restDuration.toInt(),
+                            setCountValue = setCount,
+                            workoutDurationValue = workoutDuration,
+                            restDurationValue = restDuration,
                             finishTraining = {
                                 Intent(applicationContext, CountdownTimerService::class.java).also {
                                     it.action = CountdownTimerService.Actions.Stop.toString()
