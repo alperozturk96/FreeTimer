@@ -46,27 +46,38 @@ class MainActivity : ComponentActivity() {
                             restDuration = it
                         }, showCountDownTimer = {
                             showCountDownTimer = true
-                            Intent(applicationContext, CountdownTimerService::class.java).also {
-                                it.action = CountdownTimerService.Actions.Start.toString()
-                                startService(it)
-                            }
+                            startService(setCount, workoutDuration, restDuration)
                         })
                     } else {
                         CountDownView(
-                            setCountValue = setCount,
-                            workoutDurationValue = workoutDuration,
-                            restDurationValue = restDuration,
                             finishTraining = {
-                                Intent(applicationContext, CountdownTimerService::class.java).also {
-                                    it.action = CountdownTimerService.Actions.Stop.toString()
-                                    stopService(it)
-                                }
+                                stopService()
                                 showCountDownTimer = false
                             }
                         )
                     }
                 }
             }
+        }
+    }
+
+    private fun startService(setCount: Int, workoutDuration: Int, restDuration: Int) {
+        Intent(applicationContext, CountdownTimerService::class.java).also {
+            it.action = CountdownTimerService.Actions.Start.toString()
+            CountdownTimerService.setCount = setCount
+            CountdownTimerService.workoutDuration = workoutDuration
+            CountdownTimerService.restDuration = restDuration
+
+            CountdownTimerService.initialRestDuration = restDuration
+            CountdownTimerService.initialWorkoutDuration = workoutDuration
+            startService(it)
+        }
+    }
+
+    private fun stopService() {
+        Intent(applicationContext, CountdownTimerService::class.java).also {
+            it.action = CountdownTimerService.Actions.Stop.toString()
+            stopService(it)
         }
     }
 

@@ -34,9 +34,6 @@ import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
 fun CountDownView(
-    setCountValue: Int,
-    workoutDurationValue: Int,
-    restDurationValue: Int,
     finishTraining: () -> Unit
 ) {
     val context: Context = LocalContext.current
@@ -44,40 +41,30 @@ fun CountDownView(
 
     var isRestModeActive by remember { mutableStateOf(false) }
 
-    var setCount by remember { mutableIntStateOf(setCountValue) }
-    var workoutDuration by remember { mutableIntStateOf(workoutDurationValue) }
-    var restDuration by remember { mutableIntStateOf(restDurationValue) }
+    var setCount by remember { mutableIntStateOf(CountdownTimerService.setCount) }
+    var workoutDuration by remember { mutableIntStateOf(CountdownTimerService.workoutDuration) }
+    var restDuration by remember { mutableIntStateOf(CountdownTimerService.restDuration) }
+
+    Handler(Looper.getMainLooper()).postDelayed({
+        isRestModeActive = CountdownTimerService.isRestModeActive
+        setCount = CountdownTimerService.setCount
+        workoutDuration = CountdownTimerService.workoutDuration
+        restDuration = CountdownTimerService.restDuration
+
+        if (CountdownTimerService.finishTraining) {
+            finishTraining()
+        }
+
+        if (CountdownTimerService.ringBell) {
+            musicPlayer.playAudio(R.raw.boxing_bell)
+            CountdownTimerService.ringBell = false
+        }
+    }, 1000)
 
     BackHandler {
         musicPlayer.stopAudio()
         finishTraining()
     }
-
-    Handler(Looper.getMainLooper()).postDelayed({
-        if (isRestModeActive) {
-            restDuration -= 1
-
-            if (restDuration == 0) {
-                setCount -= 1
-                isRestModeActive = false
-                workoutDuration = workoutDurationValue
-                restDuration = restDurationValue
-                musicPlayer.playAudio(R.raw.boxing_bell)
-
-                if (setCount == 0) {
-                    musicPlayer.stopAudio()
-                    finishTraining()
-                }
-            }
-        } else {
-            workoutDuration -= 1
-
-            if (workoutDuration == 0) {
-                musicPlayer.playAudio(R.raw.boxing_bell)
-                isRestModeActive = true
-            }
-        }
-    }, 1000)
 
     val timeLeft = if (isRestModeActive) {
         "Rest: $restDuration"
