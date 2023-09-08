@@ -3,6 +3,7 @@ package com.coolnexttech.freetimer.view
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.compose.BackHandler
@@ -35,7 +36,6 @@ import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
 fun CountDownView(
-    service: CountdownTimerService,
     setCountValue: Int,
     workoutDurationValue: Int,
     restDurationValue: Int,
@@ -55,7 +55,7 @@ fun CountDownView(
         finishTraining()
     }
 
-    service.tick(1) {
+    Handler(Looper.getMainLooper()).postDelayed({
         if (isRestModeActive) {
             restDuration -= 1
 
@@ -79,7 +79,7 @@ fun CountDownView(
                 isRestModeActive = true
             }
         }
-    }
+    }, 1000)
 
     val timeLeft = if (isRestModeActive) {
         "Rest: $restDuration"

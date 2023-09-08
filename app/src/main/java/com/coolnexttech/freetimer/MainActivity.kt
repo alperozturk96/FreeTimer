@@ -1,5 +1,6 @@
 package com.coolnexttech.freetimer
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -8,6 +9,7 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,15 +27,8 @@ import com.coolnexttech.freetimer.view.CountDownView
 import com.coolnexttech.freetimer.view.HomeView
 
 class MainActivity : ComponentActivity() {
-    private lateinit var countdownTimerService: CountdownTimerService
-    private var boundService = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Intent(this, CountdownTimerService::class.java).also { intent ->
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
-        }
 
         setContent {
             askNotificationPermission(this)
@@ -63,7 +58,6 @@ class MainActivity : ComponentActivity() {
                         })
                     } else {
                         CountDownView(
-                            countdownTimerService,
                             setCountValue = setCount.toInt(),
                             workoutDurationValue = workoutDuration.toInt(),
                             restDurationValue = restDuration.toInt(),
@@ -78,18 +72,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private val serviceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as CountdownTimerService.LocalBinder
-            countdownTimerService = binder.getService()
-            boundService = true
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            boundService = false
         }
     }
 
