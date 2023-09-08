@@ -1,112 +1,41 @@
 package com.coolnexttech.freetimer
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import com.coolnexttech.freetimer.service.CountdownTimerService
+import androidx.navigation.compose.rememberNavController
+import com.coolnexttech.freetimer.navigation.Destinations
+import com.coolnexttech.freetimer.navigation.Navigation
 import com.coolnexttech.freetimer.ui.theme.FreeTimerTheme
-import com.coolnexttech.freetimer.view.CountDownView
-import com.coolnexttech.freetimer.view.HomeView
-
 
 class MainActivity : ComponentActivity() {
-    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        askNotificationPermission(this)
+
         setContent {
-            askNotificationPermission(this)
-
-            var showCountDownTimer by remember { mutableStateOf(false) }
-            var setCount by remember { mutableIntStateOf(0) }
-            var workoutDuration by remember { mutableIntStateOf(0) }
-            var restDuration by remember { mutableIntStateOf(0) }
-
             FreeTimerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
-                ) {
-                    if (!showCountDownTimer) {
-                        HomeView(setSetCount = {
-                            setCount = it
-                        }, setWorkoutDuration = {
-                            workoutDuration = it
-                        }, setRestDuration = {
-                            restDuration = it
-                        }, showCountDownTimer = {
-                            if (setCount > 0 && workoutDuration > 0 && restDuration > 0) {
-                                showCountDownTimer = true
-                                acquireWakeLock(setCount, workoutDuration, restDuration)
-                                startService(setCount, workoutDuration, restDuration)
-                            } else {
-                                Toast.makeText(this, "Please enter valid timer value", Toast.LENGTH_SHORT).show()
-                            }
-                        })
-                    } else {
-                        CountDownView(
-                            finishTraining = {
-                                stopService()
-                                wakeLock?.release()
-                                showCountDownTimer = false
-                                setCount = 0
-                                workoutDuration = 0
-                                restDuration = 0
-                            }
-                        )
-                    }
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    RootView()
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        wakeLock?.release();
-    }
-
-    private fun acquireWakeLock(setCount: Int, workoutDuration: Int, restDuration: Int) {
-        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(
-            PowerManager.PARTIAL_WAKE_LOCK,
-            "FreeTimer::FreeTimerWakeLockTag"
-        )
-        wakeLock?.acquire(setCount*workoutDuration*1000L + setCount*restDuration*1000L + setCount*1000L)
-    }
-
-    private fun startService(setCount: Int, workoutDuration: Int, restDuration: Int) {
-        Intent(applicationContext, CountdownTimerService::class.java).also {
-            it.action = CountdownTimerService.Actions.Start.toString()
-            CountdownTimerService.setCount = setCount
-            CountdownTimerService.workoutDuration = workoutDuration
-            CountdownTimerService.restDuration = restDuration
-
-            CountdownTimerService.initialRestDuration = restDuration
-            CountdownTimerService.initialWorkoutDuration = workoutDuration
-            startForegroundService(it)
-        }
-    }
-
-    private fun stopService() {
-        Intent(applicationContext, CountdownTimerService::class.java).also {
-            it.action = CountdownTimerService.Actions.Stop.toString()
-            stopService(it)
-        }
+    @Composable
+    private fun RootView() {
+        val navController = rememberNavController()
+        Navigation(navController, startDestination = Destinations.Home)
     }
 
     private fun askNotificationPermission(activity: Activity) {

@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.view
+package com.coolnexttech.freetimer.view.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,15 +21,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.coolnexttech.freetimer.model.WorkoutData
+import com.coolnexttech.freetimer.navigation.Destinations
 import com.coolnexttech.freetimer.ui.theme.BorderColor
+import com.google.gson.Gson
 
 @Composable
-fun HomeView(
-    setSetCount: (Int) -> Unit,
-    setWorkoutDuration: (Int) -> Unit,
-    setRestDuration: (Int) -> Unit,
-    showCountDownTimer: () -> Unit,
-) {
+fun HomeView(navController: NavHostController) {
+    var workoutData by remember { mutableStateOf(WorkoutData(0, 0, 0)) }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -38,19 +39,20 @@ fun HomeView(
         Spacer(modifier = Modifier.weight(1f))
 
         TimerInput(label = "Set Count", onValueChange = {
-            setSetCount(it)
+            workoutData = workoutData.copy(setCount = it)
         })
 
         TimerInput(label = "Workout Duration In Second", onValueChange = {
-            setWorkoutDuration(it)
+            workoutData = workoutData.copy(workDuration = it)
         })
 
         TimerInput(label = "Rest Duration In Second", onValueChange = {
-            setRestDuration(it)
+            workoutData = workoutData.copy(restDuration = it)
         })
 
         Button(onClick = {
-            showCountDownTimer()
+            val json = Gson().toJson(workoutData)
+            navController.navigate(Destinations.CountDown + "/" + json)
         }) {
             Text(text = "Start Timer", color = Color.Black)
         }

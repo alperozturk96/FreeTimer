@@ -1,10 +1,9 @@
-package com.coolnexttech.freetimer.view
+package com.coolnexttech.freetimer.view.countdown
 
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,50 +26,59 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
-import com.coolnexttech.freetimer.service.CountdownTimerService
+import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.util.MusicPlayer
 
 @Composable
-fun CountDownView(
-    finishTraining: () -> Unit
-) {
+fun CountDownView(navController: NavHostController, initialWorkoutData: WorkoutData) {
+    val initialWorkoutDuration = initialWorkoutData.workDuration
+    val initialRestDuration = initialWorkoutData.restDuration
+
+    var workoutData by remember { mutableStateOf(initialWorkoutData) }
+    var isRestModeActive by remember { mutableStateOf(false) }
+
     val context: Context = LocalContext.current
     val musicPlayer = MusicPlayer(context)
 
-    var isRestModeActive by remember { mutableStateOf(false) }
-
-    var setCount by remember { mutableIntStateOf(CountdownTimerService.setCount) }
-    var workoutDuration by remember { mutableIntStateOf(CountdownTimerService.workoutDuration) }
-    var restDuration by remember { mutableIntStateOf(CountdownTimerService.restDuration) }
-
     Handler(Looper.getMainLooper()).postDelayed({
-        isRestModeActive = CountdownTimerService.isRestModeActive
-        setCount = CountdownTimerService.setCount
-        workoutDuration = CountdownTimerService.workoutDuration
-        restDuration = CountdownTimerService.restDuration
+        if (isRestModeActive) {
+            workoutData = workoutData.copy(restDuration = workoutData.restDuration - 1)
 
-        if (CountdownTimerService.finishTraining) {
-            CountdownTimerService.finishTraining = false
-            finishTraining()
-        }
+            if (workoutData.restDuration == 0) {
+                workoutData = workoutData.copy(setCount = workoutData.setCount - 1)
+                isRestModeActive = false
+                workoutData = workoutData.copy(workDuration = initialWorkoutDuration)
+                workoutData = workoutData.copy(restDuration = initialRestDuration)
+                musicPlayer.playAudio(R.raw.boxing_bell)
 
-        if (CountdownTimerService.ringBell) {
-            musicPlayer.playAudio(R.raw.boxing_bell)
-            CountdownTimerService.ringBell = false
+                if (workoutData.setCount == 0) {
+                    musicPlayer.stopAudio()
+                    navController.popBackStack()
+                }
+            }
+        } else {
+            workoutData = workoutData.copy(workDuration = workoutData.workDuration - 1)
+
+            if (workoutData.workDuration == 0) {
+                musicPlayer.playAudio(R.raw.boxing_bell)
+                isRestModeActive = true
+            }
         }
     }, 1000)
 
-    BackHandler {
-        CountdownTimerService.reset()
-        musicPlayer.stopAudio()
-        finishTraining()
-    }
+    CountDownViewState(workoutData, isRestModeActive)
+}
+
+@Composable
+private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boolean) {
+    val context: Context = LocalContext.current
 
     val timeLeft = if (isRestModeActive) {
-        "Rest: $restDuration"
+        "Rest: " + workoutData.restDuration
     } else {
-        "Time Left: $workoutDuration"
+        "Time Left: " + workoutData.workDuration
     }
 
     updateNotification(context, timeLeft)
@@ -82,7 +89,7 @@ fun CountDownView(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Spacer(modifier = Modifier.weight(1f))
-        InfoText(text = "SET: $setCount")
+        InfoText(text = "SET: " + workoutData.setCount)
         InfoText(text = timeLeft)
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -93,14 +100,14 @@ private fun updateNotification(context: Context, timeLeft: String) {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     val notification = NotificationCompat.Builder(
         context,
-        CountdownTimerService.countdownTimerServiceId
+        "CountdownTimerServiceNotification"
     )
         .setSilent(true)
         .setSmallIcon(R.drawable.im_timer)
         .setContentTitle(timeLeft)
         .build()
 
-    notificationManager.notify(CountdownTimerService.notificationId, notification)
+    notificationManager.notify(1, notification)
 }
 
 @Composable
