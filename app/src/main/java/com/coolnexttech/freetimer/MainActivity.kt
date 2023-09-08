@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,8 +46,12 @@ class MainActivity : ComponentActivity() {
                         }, setRestDuration = {
                             restDuration = it
                         }, showCountDownTimer = {
-                            showCountDownTimer = true
-                            startService(setCount, workoutDuration, restDuration)
+                            if (setCount > 0 && workoutDuration > 0 && restDuration > 0) {
+                                showCountDownTimer = true
+                                startService(setCount, workoutDuration, restDuration)
+                            } else {
+                                Toast.makeText(this, "Please enter valid timer value", Toast.LENGTH_SHORT).show()
+                            }
                         })
                     } else {
                         CountDownView(

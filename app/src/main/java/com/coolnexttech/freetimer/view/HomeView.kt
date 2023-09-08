@@ -78,7 +78,7 @@ private fun TimerInput(
         maxLines = 1,
         value = text,
         onValueChange = { value ->
-            if (value.length <= 2) {
+            if (value.length <= 3) {
                 val sanitizedValue = value.replace(Regex("[^0-9]"), "")
                 text = sanitizedValue.filter { it.isDigit() }
                 try {

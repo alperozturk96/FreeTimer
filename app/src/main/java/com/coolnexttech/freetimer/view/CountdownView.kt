@@ -52,6 +52,7 @@ fun CountDownView(
         restDuration = CountdownTimerService.restDuration
 
         if (CountdownTimerService.finishTraining) {
+            CountdownTimerService.finishTraining = false
             finishTraining()
         }
 
@@ -62,6 +63,7 @@ fun CountDownView(
     }, 1000)
 
     BackHandler {
+        CountdownTimerService.reset()
         musicPlayer.stopAudio()
         finishTraining()
     }

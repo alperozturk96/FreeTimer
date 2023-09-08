@@ -26,6 +26,17 @@ class CountdownTimerService: Service() {
 
         var ringBell = false
         var finishTraining = false
+
+        fun reset() {
+            setCount = 0
+            restDuration = 0
+            workoutDuration = 0
+            isRestModeActive = false
+            ringBell = false
+            finishTraining = false
+            initialWorkoutDuration = 0
+            initialRestDuration = 0
+        }
     }
 
     private var timer = Timer()
