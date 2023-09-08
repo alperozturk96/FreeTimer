@@ -62,7 +62,11 @@ class MainActivity : ComponentActivity() {
                         CountDownView(
                             finishTraining = {
                                 stopService()
+                                wakeLock?.release()
                                 showCountDownTimer = false
+                                setCount = 0
+                                workoutDuration = 0
+                                restDuration = 0
                             }
                         )
                     }
@@ -94,7 +98,7 @@ class MainActivity : ComponentActivity() {
 
             CountdownTimerService.initialRestDuration = restDuration
             CountdownTimerService.initialWorkoutDuration = workoutDuration
-            startService(it)
+            startForegroundService(it)
         }
     }
 

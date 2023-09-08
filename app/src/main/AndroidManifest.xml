@@ -29,6 +29,7 @@
 
         <service
             android:name=".service.CountdownTimerService"
+            android:stopWithTask="false"
             android:enabled="true"
             android:foregroundServiceType="specialUse"/>
     </application>
