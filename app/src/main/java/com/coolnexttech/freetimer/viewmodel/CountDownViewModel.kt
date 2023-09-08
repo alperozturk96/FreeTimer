@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CountDownViewModel: ViewModel() {
-    private val _isTrainingCompleted = MutableStateFlow(false)
-    val isTrainingCompleted = _isTrainingCompleted.asStateFlow()
+    private val _isCountdownCompleted = MutableStateFlow(false)
+    val isCountDownCompleted = _isCountdownCompleted.asStateFlow()
 
     private val _isRestModeActive = MutableStateFlow(false)
     val isRestModeActive = _isRestModeActive.asStateFlow()
@@ -36,49 +36,65 @@ class CountDownViewModel: ViewModel() {
         startCountDown()
     }
 
+    private fun handleRestMode() {
+        _workoutData.update {
+            it.copy(restDuration = _workoutData.value.restDuration - 1)
+        }
+
+        if (_workoutData.value.restDuration == 0) {
+            _workoutData.update {
+                it.copy(setCount = _workoutData.value.setCount - 1)
+            }
+
+            _isRestModeActive.update {
+                false
+            }
+            _workoutData.update {
+                it.copy(workDuration = _initialWorkoutDuration)
+            }
+            _workoutData.update {
+                it.copy(restDuration = _initialRestDuration)
+            }
+
+            musicPlayer?.playAudio(R.raw.boxing_bell)
+
+            if (_workoutData.value.setCount == 0) {
+                stopCountdown()
+            }
+        }
+    }
+
+    private fun stopCountdown() {
+        musicPlayer?.stopAudio()
+        _isCountdownCompleted.update {
+            true
+        }
+    }
+
+    private fun handleWorkoutMode() {
+        _workoutData.update {
+            it.copy(workDuration = _workoutData.value.workDuration - 1)
+        }
+
+        if (_workoutData.value.workDuration == 0) {
+            switchToRestMode()
+        }
+    }
+
+    private fun switchToRestMode() {
+        musicPlayer?.playAudio(R.raw.boxing_bell)
+        _isRestModeActive.update {
+            true
+        }
+    }
+
     private fun startCountDown() {
         viewModelScope.launch(Dispatchers.Main) {
             while (true) {
                 if (_isRestModeActive.value) {
-                    _workoutData.update {
-                        it.copy(restDuration = _workoutData.value.restDuration - 1)
-                    }
-
-                    if (_workoutData.value.restDuration == 0) {
-                        _workoutData.update {
-                            it.copy(setCount = _workoutData.value.setCount - 1)
-                        }
-
-                        _isRestModeActive.update {
-                            false
-                        }
-                        _workoutData.update {
-                            it.copy(workDuration = _initialWorkoutDuration)
-                        }
-                        _workoutData.update {
-                            it.copy(restDuration = _initialRestDuration)
-                        }
-
-                        musicPlayer?.playAudio(R.raw.boxing_bell)
-
-                        if (_workoutData.value.setCount == 0) {
-                            musicPlayer?.stopAudio()
-                            _isTrainingCompleted.update {
-                                true
-                            }
-                        }
-                    }
+                    handleRestMode()
                 } else {
-                    _workoutData.update {
-                        it.copy(workDuration = _workoutData.value.workDuration - 1)
-                    }
-
-                    if (_workoutData.value.workDuration == 0) {
-                        musicPlayer?.playAudio(R.raw.boxing_bell)
-                        _isRestModeActive.update {
-                            true
-                        }
-                    }
+                    handleWorkoutMode()
                 }
 
                 delay(1000)

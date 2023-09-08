@@ -35,7 +35,7 @@ fun CountDownView(navController: NavHostController, viewModel: CountDownViewMode
 
     val workoutData by viewModel.workoutData.collectAsState()
     val isRestModeActive by viewModel.isRestModeActive.collectAsState()
-    val isTrainingCompleted by viewModel.isTrainingCompleted.collectAsState()
+    val isTrainingCompleted by viewModel.isCountDownCompleted.collectAsState()
 
     DisposableEffect(Unit) {
         viewModel.init(initialWorkoutData, context)
