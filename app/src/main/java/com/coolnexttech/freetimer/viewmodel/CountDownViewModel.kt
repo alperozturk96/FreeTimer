@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CountDownViewModel: ViewModel() {
+class CountDownViewModel : ViewModel() {
+
+    // region Flows
     private val _isCountdownCompleted = MutableStateFlow(false)
     val isCountDownCompleted = _isCountdownCompleted.asStateFlow()
 
@@ -22,10 +24,13 @@ class CountDownViewModel: ViewModel() {
 
     private val _workoutData = MutableStateFlow(WorkoutData())
     val workoutData = _workoutData.asStateFlow()
+    // endregion
 
+    // region Dependencies
     private var musicPlayer: MusicPlayer? = null
     private var _initialWorkoutDuration = 0
     private var _initialRestDuration = 0
+    // endregion
 
     fun init(workoutData: WorkoutData, context: Context) {
         _workoutData.value = workoutData
@@ -36,31 +41,46 @@ class CountDownViewModel: ViewModel() {
         startCountDown()
     }
 
+    private fun startCountDown() {
+        viewModelScope.launch(Dispatchers.Main) {
+            while (true) {
+                if (_isRestModeActive.value) {
+                    handleRestMode()
+                } else {
+                    handleWorkoutMode()
+                }
+
+                delay(1000)
+            }
+        }
+    }
+
+    // region Rest Mode
     private fun handleRestMode() {
         _workoutData.update {
             it.copy(restDuration = _workoutData.value.restDuration - 1)
         }
 
         if (_workoutData.value.restDuration == 0) {
-            _workoutData.update {
-                it.copy(setCount = _workoutData.value.setCount - 1)
-            }
+            startNextSet()
+        }
+    }
 
-            _isRestModeActive.update {
-                false
-            }
-            _workoutData.update {
-                it.copy(workDuration = _initialWorkoutDuration)
-            }
-            _workoutData.update {
-                it.copy(restDuration = _initialRestDuration)
-            }
+    private fun startNextSet() {
+        _isRestModeActive.update {
+            false
+        }
+        _workoutData.update {
+            it.copy(
+                setCount = _workoutData.value.setCount - 1,
+                workDuration = _initialWorkoutDuration,
+                restDuration = _initialRestDuration
+            )
+        }
+        musicPlayer?.playAudio(R.raw.boxing_bell)
 
-            musicPlayer?.playAudio(R.raw.boxing_bell)
-
-            if (_workoutData.value.setCount == 0) {
-                stopCountdown()
-            }
+        if (_workoutData.value.setCount == 0) {
+            stopCountdown()
         }
     }
 
@@ -70,7 +90,9 @@ class CountDownViewModel: ViewModel() {
             true
         }
     }
+    // endregion
 
+    // region Workout Mode
     private fun handleWorkoutMode() {
         _workoutData.update {
             it.copy(workDuration = _workoutData.value.workDuration - 1)
@@ -87,18 +109,5 @@ class CountDownViewModel: ViewModel() {
             true
         }
     }
-
-    private fun startCountDown() {
-        viewModelScope.launch(Dispatchers.Main) {
-            while (true) {
-                if (_isRestModeActive.value) {
-                    handleRestMode()
-                } else {
-                    handleWorkoutMode()
-                }
-
-                delay(1000)
-            }
-        }
-    }
+    // endregion
 }
