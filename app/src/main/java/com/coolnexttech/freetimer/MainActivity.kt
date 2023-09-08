@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,7 +23,10 @@ import com.coolnexttech.freetimer.ui.theme.FreeTimerTheme
 import com.coolnexttech.freetimer.view.CountDownView
 import com.coolnexttech.freetimer.view.HomeView
 
+
 class MainActivity : ComponentActivity() {
+    private var wakeLock: PowerManager.WakeLock? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,6 +52,7 @@ class MainActivity : ComponentActivity() {
                         }, showCountDownTimer = {
                             if (setCount > 0 && workoutDuration > 0 && restDuration > 0) {
                                 showCountDownTimer = true
+                                acquireWakeLock(setCount, workoutDuration, restDuration)
                                 startService(setCount, workoutDuration, restDuration)
                             } else {
                                 Toast.makeText(this, "Please enter valid timer value", Toast.LENGTH_SHORT).show()
@@ -64,6 +69,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        wakeLock?.release();
+    }
+
+    private fun acquireWakeLock(setCount: Int, workoutDuration: Int, restDuration: Int) {
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "FreeTimer::FreeTimerWakeLockTag"
+        )
+        wakeLock?.acquire(setCount*workoutDuration*1000L + setCount*restDuration*1000L + setCount*1000L)
     }
 
     private fun startService(setCount: Int, workoutDuration: Int, restDuration: Int) {
