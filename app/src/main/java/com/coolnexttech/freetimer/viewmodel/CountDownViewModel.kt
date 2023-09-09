@@ -61,7 +61,7 @@ class CountDownViewModel : ViewModel() {
             it.copy(restDuration = _workoutData.value.restDuration - 1)
         }
 
-        if (_workoutData.value.restDuration == 0) {
+        if (_workoutData.value.isCurrentSetRestFinished()) {
             startNextSet()
         }
     }
@@ -79,7 +79,7 @@ class CountDownViewModel : ViewModel() {
         }
         musicPlayer?.playAudio(R.raw.boxing_bell)
 
-        if (_workoutData.value.setCount == 0) {
+        if (_workoutData.value.isWorkoutFinished()) {
             stopCountdown()
         }
     }
@@ -98,7 +98,7 @@ class CountDownViewModel : ViewModel() {
             it.copy(workDuration = _workoutData.value.workDuration - 1)
         }
 
-        if (_workoutData.value.workDuration == 0) {
+        if (_workoutData.value.isCurrentSetWorkoutFinished()) {
             switchToRestMode()
         }
     }

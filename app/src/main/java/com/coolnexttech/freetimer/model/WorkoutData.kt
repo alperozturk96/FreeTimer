@@ -8,4 +8,16 @@ data class WorkoutData(
     fun isValid(): Boolean {
         return setCount > 0 && workDuration > 0 && restDuration > 0
     }
+
+    fun isCurrentSetWorkoutFinished(): Boolean {
+        return workDuration == 0
+    }
+
+    fun isCurrentSetRestFinished(): Boolean {
+        return restDuration == 0
+    }
+
+    fun isWorkoutFinished(): Boolean {
+        return setCount == 0
+    }
 }
