@@ -11,38 +11,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel: ViewModel() {
-    private val _workoutData = MutableStateFlow(WorkoutData())
-    val workoutData: StateFlow<WorkoutData> = _workoutData
-
-    private val _showSaveWorkoutAlert = MutableStateFlow(false)
-    val showSaveWorkoutAlert: StateFlow<Boolean> = _showSaveWorkoutAlert
+class WorkoutDataListViewModel: ViewModel() {
+    private val _workoutDataList = MutableStateFlow<List<WorkoutData>>(listOf())
+    val workoutDataList: StateFlow<List<WorkoutData>> = _workoutDataList
 
     private var workoutDataStorage: WorkoutDataStorage? = null
 
     fun initDb(context: Context) {
         workoutDataStorage = WorkoutDataStorage.getInstance(context)
+        getWorkoutDataList()
     }
 
-    fun showSaveWorkoutAlert() {
-        _showSaveWorkoutAlert.update {
-            true
-        }
-    }
-
-    fun hideSaveWorkoutAlert() {
-        _showSaveWorkoutAlert.update {
-            false
-        }
-    }
-
-    fun saveWorkout() {
+    private fun getWorkoutDataList() {
         viewModelScope.launch(Dispatchers.IO) {
-            workoutDataStorage?.add(_workoutData.value)
+            val list = workoutDataStorage?.getAll() ?: return@launch
 
             launch(Dispatchers.Main) {
-                hideSaveWorkoutAlert()
+                _workoutDataList.update {
+                    list
+                }
             }
+
         }
     }
 }

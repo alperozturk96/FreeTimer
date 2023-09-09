@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +58,11 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
 
     val context = LocalContext.current
 
+    DisposableEffect(Unit) {
+        viewModel.initDb(context)
+        onDispose {  }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -70,6 +77,14 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
                     )
                 },
                 actions = {
+                    IconButton(onClick = {
+                        navController.navigate(Destinations.WorkoutDataList)
+                    }) {
+                        Icon(
+                            Icons.Default.List,
+                            contentDescription = "Navigate To Workout Data List"
+                        )
+                    }
                     IconButton(onClick = {
                         viewModel.showSaveWorkoutAlert()
                     }) {

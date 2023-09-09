@@ -10,8 +10,10 @@ import androidx.navigation.navArgument
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.view.countdown.CountDownView
 import com.coolnexttech.freetimer.view.home.HomeView
+import com.coolnexttech.freetimer.view.workoutDataList.WorkoutDataListView
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 import com.coolnexttech.freetimer.viewmodel.HomeViewModel
+import com.coolnexttech.freetimer.viewmodel.WorkoutDataListViewModel
 import com.google.gson.Gson
 
 @Composable
@@ -19,7 +21,12 @@ fun Navigation(navController: NavHostController, startDestination: String) {
     NavHost(navController, startDestination) {
         composable(Destinations.Home) {
             val viewModel: HomeViewModel = viewModel()
-            HomeView(navController = navController, viewModel)
+            HomeView(navController, viewModel)
+        }
+
+        composable(Destinations.WorkoutDataList) {
+            val viewModel: WorkoutDataListViewModel = viewModel()
+            WorkoutDataListView(navController, viewModel)
         }
 
         composable(

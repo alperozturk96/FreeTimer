@@ -3,10 +3,11 @@ package com.coolnexttech.freetimer.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity
 data class WorkoutData(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    @PrimaryKey val id: UUID = UUID.randomUUID(),
     @ColumnInfo(name = "set_count") var setCount: Int = 0,
     @ColumnInfo(name = "work_duration") var workDuration: Int = 0,
     @ColumnInfo(name = "rest_duration") var restDuration: Int = 0,

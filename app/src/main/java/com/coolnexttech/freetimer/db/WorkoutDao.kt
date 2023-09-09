@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.service
+package com.coolnexttech.freetimer.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -15,7 +15,7 @@ interface WorkoutDao {
     fun findById(id: Int): WorkoutData
 
     @Insert
-    fun insertAll(vararg workoutDataList: WorkoutData)
+    fun insert(vararg workoutDataList: WorkoutData)
 
     @Delete
     fun delete(workoutData: WorkoutData)

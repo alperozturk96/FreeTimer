@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.service
+package com.coolnexttech.freetimer.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

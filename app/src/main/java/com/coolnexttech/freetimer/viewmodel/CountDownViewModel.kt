@@ -22,7 +22,7 @@ class CountDownViewModel : ViewModel() {
     private val _isRestModeActive = MutableStateFlow(false)
     val isRestModeActive = _isRestModeActive.asStateFlow()
 
-    private val _workoutData = MutableStateFlow(WorkoutData(id = 1))
+    private val _workoutData = MutableStateFlow(WorkoutData())
     val workoutData = _workoutData.asStateFlow()
     // endregion
 
