@@ -2,14 +2,18 @@ package com.coolnexttech.freetimer.view.home
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -46,6 +52,8 @@ import com.google.gson.Gson
 @Composable
 fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
     val workoutData: WorkoutData by viewModel.workoutData.collectAsState()
+    val showSaveWorkoutAlert by viewModel.showSaveWorkoutAlert.collectAsState()
+
     val context = LocalContext.current
 
     Scaffold(
@@ -63,7 +71,7 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
                 },
                 actions = {
                     IconButton(onClick = {
-
+                        viewModel.showSaveWorkoutAlert()
                     }) {
                         Icon(
                             Icons.Default.AddCircle,
@@ -73,11 +81,11 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
                 },
             )
         },
-    ) {
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it),
+                .padding(padding),
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -103,7 +111,32 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
 
             Spacer(modifier = Modifier.weight(1f))
         }
+
+        if (showSaveWorkoutAlert) {
+            SaveWorkoutAlert(viewModel)
+        }
     }
+}
+
+@Composable
+private fun SaveWorkoutAlert(viewModel: HomeViewModel) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = {
+            Text(text = "Info")
+        },
+        text = { Text(text = "Would you like to save current workout data?") },
+        confirmButton = {
+            TextButton(onClick = { viewModel.saveWorkout() }) {
+                Text("Save", color = Color.Black)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { viewModel.hideSaveWorkoutAlert() }) {
+                Text("Cancel", color = Color.Black)
+            }
+        }
+    )
 }
 
 private fun navigateToCountDownView(
