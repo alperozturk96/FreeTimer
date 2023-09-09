@@ -8,6 +8,7 @@ import java.util.UUID
 @Entity
 data class WorkoutData(
     @PrimaryKey val id: UUID = UUID.randomUUID(),
+    @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "set_count") var setCount: Int = 0,
     @ColumnInfo(name = "work_duration") var workDuration: Int = 0,
     @ColumnInfo(name = "rest_duration") var restDuration: Int = 0,

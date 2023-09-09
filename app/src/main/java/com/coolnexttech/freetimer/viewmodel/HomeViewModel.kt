@@ -30,6 +30,12 @@ class HomeViewModel: ViewModel() {
         }
     }
 
+    fun updateWorkoutDataName(name: String) {
+        _workoutData.update {
+            it.copy(name = name)
+        }
+    }
+
     fun hideSaveWorkoutAlert() {
         _showSaveWorkoutAlert.update {
             false

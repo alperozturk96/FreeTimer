@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -60,7 +62,7 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
 
     DisposableEffect(Unit) {
         viewModel.initDb(context)
-        onDispose {  }
+        onDispose { }
     }
 
     Scaffold(
@@ -128,21 +130,53 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
         }
 
         if (showSaveWorkoutAlert) {
-            SaveWorkoutAlert(viewModel)
+            SaveWorkoutAlert(context, viewModel)
         }
     }
 }
 
 @Composable
-private fun SaveWorkoutAlert(viewModel: HomeViewModel) {
+private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
+    var name by remember { mutableStateOf("") }
+    var warningMessage: String? = null
+
     AlertDialog(
         onDismissRequest = { },
         title = {
             Text(text = "Info")
         },
-        text = { Text(text = "Would you like to save current workout data?") },
+        text = {
+            Column {
+                Text(text = "Would you like to save current workout data?")
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                TextField(
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    value = name,
+                    onValueChange = {
+                        name = it
+                        viewModel.updateWorkoutDataName(it)
+                    },
+                    singleLine = true
+                )
+            }
+        },
         confirmButton = {
-            TextButton(onClick = { viewModel.saveWorkout() }) {
+            TextButton(onClick = {
+                if (!viewModel.workoutData.value.isValid()) {
+                    warningMessage = "Please fill workout data for saving"
+                }
+                if (name.isEmpty()) {
+                    warningMessage = "Please enter name for workout data"
+                }
+
+                if (warningMessage != null) {
+                    Toast.makeText(context, warningMessage, Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.saveWorkout()
+                }
+            }) {
                 Text("Save", color = Color.Black)
             }
         },
