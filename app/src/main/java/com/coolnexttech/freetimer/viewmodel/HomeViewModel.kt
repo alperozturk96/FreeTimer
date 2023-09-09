@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 class HomeViewModel: ViewModel() {
-    private val _workoutData = MutableStateFlow(WorkoutData())
+    private val _workoutData = MutableStateFlow(WorkoutData(id = 1))
     val workoutData: StateFlow<WorkoutData> = _workoutData
 
     private val _showSaveWorkoutAlert = MutableStateFlow(false)

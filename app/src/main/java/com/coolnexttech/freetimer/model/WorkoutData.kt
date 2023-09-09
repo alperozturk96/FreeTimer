@@ -1,9 +1,15 @@
 package com.coolnexttech.freetimer.model
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
 data class WorkoutData(
-    var setCount: Int = 0,
-    var workDuration: Int = 0,
-    var restDuration: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "set_count") var setCount: Int = 0,
+    @ColumnInfo(name = "work_duration") var workDuration: Int = 0,
+    @ColumnInfo(name = "rest_duration") var restDuration: Int = 0,
 ) {
     fun isValid(): Boolean {
         return setCount > 0 && workDuration > 0 && restDuration > 0

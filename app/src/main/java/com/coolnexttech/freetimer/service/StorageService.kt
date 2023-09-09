@@ -1,8 +1,13 @@
 package com.coolnexttech.freetimer.service
 
 import android.content.Context
-import com.coolnexttech.freetimer.model.WorkoutData
+import androidx.room.Room
 
-class StorageService(private val context: Context) {
-    private val sharedPreferences = context.getSharedPreferences("FreeTimer", Context.MODE_PRIVATE)
+class StorageService(context: Context) {
+    private val db = Room.databaseBuilder(
+        context,
+        WorkoutDatabase::class.java, "free-timer-db"
+    ).build()
+
+
 }
