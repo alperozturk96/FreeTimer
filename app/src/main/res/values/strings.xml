@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Free Timer</string>
+
+    <string name="home_screen_set_count_input_placeholder">Set Count</string>
+    <string name="home_screen_workout_duration_input_placeholder">Workout Duration (In Second)</string>
+    <string name="home_screen_rest_duration_input_placeholder">Rest Duration (In Second)</string>
+    <string name="home_screen_start_timer_button_text">Start Timer</string>
+
+
+    <string name="home_screen_save_workout_alert_title">Save Current Workout Data</string>
+    <string name="home_screen_save_workout_alert_placeholder">Workout Name</string>
+    <string name="home_screen_save_workout_alert_warning_text">Please fill workout data for saving</string>
+    <string name="home_screen_save_workout_alert_warning_second_text">Please enter name for workout data</string>
+    <string name="home_screen_save_workout_alert_confirm_button_text">Save</string>
+    <string name="home_screen_save_workout_alert_dismiss_button_text">Cancel</string>
+
+    <string name="count_down_screen_set_count_info_text">SET</string>
+    <string name="count_down_screen_work_duration_info_text">Time Left: </string>
+    <string name="count_down_screen_rest_duration_info_text">Rest: </string>
+
 </resources>

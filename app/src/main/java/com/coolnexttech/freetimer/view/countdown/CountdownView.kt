@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
@@ -64,9 +65,9 @@ private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boole
     val context: Context = LocalContext.current
 
     val timeLeft = if (isRestModeActive) {
-        "Rest: " + workoutData.restDuration
+        stringResource(id = R.string.count_down_screen_rest_duration_info_text) + workoutData.restDuration
     } else {
-        "Time Left: " + workoutData.workDuration
+        stringResource(id = R.string.count_down_screen_work_duration_info_text) + workoutData.workDuration
     }
 
     updateNotification(context, timeLeft)
@@ -77,7 +78,7 @@ private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boole
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Spacer(modifier = Modifier.weight(1f))
-        InfoText(text = "SET: " + workoutData.setCount)
+        InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + workoutData.setCount)
         InfoText(text = timeLeft)
         Spacer(modifier = Modifier.weight(1f))
     }

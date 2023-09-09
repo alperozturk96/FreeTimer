@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
 import com.coolnexttech.freetimer.ui.theme.BorderColor
@@ -95,22 +96,22 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
-            TimerInput(label = "Set Count", onValueChange = {
+            TimerInput(label = stringResource(id = R.string.home_screen_set_count_input_placeholder), onValueChange = {
                 workoutData.setCount = it
             })
 
-            TimerInput(label = "Workout Duration In Second", onValueChange = {
+            TimerInput(label = stringResource(id = R.string.home_screen_workout_duration_input_placeholder), onValueChange = {
                 workoutData.workDuration = it
             })
 
-            TimerInput(label = "Rest Duration In Second", onValueChange = {
+            TimerInput(label = stringResource(id = R.string.home_screen_rest_duration_input_placeholder), onValueChange = {
                 workoutData.restDuration = it
             })
 
             Button(onClick = {
                 Destinations.navigateToCountDownView(workoutData, context, navController)
             }) {
-                Text(text = "Start Timer", color = Color.Black)
+                Text(text = stringResource(id = R.string.home_screen_start_timer_button_text), color = Color.Black)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -130,7 +131,7 @@ private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
     AlertDialog(
         onDismissRequest = { },
         title = {
-            Text(text = "Save Current Workout Data")
+            Text(text = stringResource(id = R.string.home_screen_save_workout_alert_title))
         },
         text = {
             TextField(
@@ -142,7 +143,7 @@ private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
                 shape = RoundedCornerShape(30.dp),
-                placeholder = { Text(text = "Workout Name") },
+                placeholder = { Text(text = stringResource(id = R.string.home_screen_save_workout_alert_placeholder)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 value = name,
                 onValueChange = {
@@ -155,10 +156,10 @@ private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
         confirmButton = {
             TextButton(onClick = {
                 if (!viewModel.workoutData.value.isValid()) {
-                    warningMessage = "Please fill workout data for saving"
+                    warningMessage = context.getString(R.string.home_screen_save_workout_alert_warning_text)
                 }
                 if (name.isEmpty()) {
-                    warningMessage = "Please enter name for workout data"
+                    warningMessage = context.getString(R.string.home_screen_save_workout_alert_warning_second_text)
                 }
 
                 if (warningMessage != null) {
@@ -167,12 +168,12 @@ private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
                     viewModel.saveWorkout()
                 }
             }) {
-                Text("Save", color = Color.Black)
+                Text(stringResource(id = R.string.home_screen_save_workout_alert_confirm_button_text), color = Color.Black)
             }
         },
         dismissButton = {
             TextButton(onClick = { viewModel.hideSaveWorkoutAlert() }) {
-                Text("Cancel", color = Color.Black)
+                Text(stringResource(id = R.string.home_screen_save_workout_alert_dismiss_button_text), color = Color.Black)
             }
         }
     )
