@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
+import com.coolnexttech.freetimer.util.NotificationService
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 
 @Composable
@@ -63,6 +64,7 @@ private fun navigateBackToHome(navController: NavHostController) {
 @Composable
 private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boolean) {
     val context: Context = LocalContext.current
+    val notificationService = NotificationService(context)
 
     val timeLeft = if (isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + workoutData.restDuration
@@ -70,7 +72,8 @@ private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boole
         stringResource(id = R.string.count_down_screen_work_duration_info_text) + workoutData.workDuration
     }
 
-    updateNotification(context, timeLeft)
+    notificationService.createNotificationChannel()
+    notificationService.createNotification(timeLeft)
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -82,21 +85,6 @@ private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boole
         InfoText(text = timeLeft)
         Spacer(modifier = Modifier.weight(1f))
     }
-}
-
-private fun updateNotification(context: Context, timeLeft: String) {
-    val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    val notification = NotificationCompat.Builder(
-        context,
-        "CountdownTimerServiceNotification"
-    )
-        .setSilent(true)
-        .setSmallIcon(R.drawable.im_timer)
-        .setContentTitle(timeLeft)
-        .build()
-
-    notificationManager.notify(1, notification)
 }
 
 @Composable
