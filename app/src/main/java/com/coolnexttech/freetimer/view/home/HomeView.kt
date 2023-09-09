@@ -118,13 +118,13 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
         }
 
         if (showSaveWorkoutAlert) {
-            SaveWorkoutAlert(context, viewModel)
+            SaveWorkoutAlertDialog(context, viewModel)
         }
     }
 }
 
 @Composable
-private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
+private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel) {
     var name by remember { mutableStateOf("") }
     var warningMessage: String? = null
 

@@ -22,6 +22,13 @@ class WorkoutDataListViewModel: ViewModel() {
         getWorkoutDataList()
     }
 
+    fun deleteWorkoutData(workoutData: WorkoutData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            workoutDataStorage?.delete(workoutData)
+            getWorkoutDataList()
+        }
+    }
+
     private fun getWorkoutDataList() {
         viewModelScope.launch(Dispatchers.IO) {
             val list = workoutDataStorage?.getAll() ?: return@launch
