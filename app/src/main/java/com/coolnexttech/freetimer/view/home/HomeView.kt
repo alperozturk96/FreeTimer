@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -24,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -43,6 +45,7 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
 import com.coolnexttech.freetimer.ui.theme.BorderColor
+import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 import com.coolnexttech.freetimer.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,24 +130,27 @@ private fun SaveWorkoutAlert(context: Context, viewModel: HomeViewModel) {
     AlertDialog(
         onDismissRequest = { },
         title = {
-            Text(text = "Info")
+            Text(text = "Save Current Workout Data")
         },
         text = {
-            Column {
-                Text(text = "Would you like to save current workout data?")
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                TextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    value = name,
-                    onValueChange = {
-                        name = it
-                        viewModel.updateWorkoutDataName(it)
-                    },
-                    singleLine = true
-                )
-            }
+            TextField(
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    focusedContainerColor = TertiaryColor,
+                    unfocusedContainerColor = TertiaryColor,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+                shape = RoundedCornerShape(30.dp),
+                placeholder = { Text(text = "Workout Name") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                value = name,
+                onValueChange = {
+                    name = it
+                    viewModel.updateWorkoutDataName(it)
+                },
+                singleLine = true
+            )
         },
         confirmButton = {
             TextButton(onClick = {
