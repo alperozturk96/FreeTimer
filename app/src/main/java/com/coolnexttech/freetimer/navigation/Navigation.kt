@@ -18,7 +18,8 @@ import com.google.gson.Gson
 fun Navigation(navController: NavHostController, startDestination: String) {
     NavHost(navController, startDestination) {
         composable(Destinations.Home) {
-            HomeView(navController = navController, viewModel = HomeViewModel())
+            val viewModel: HomeViewModel = viewModel()
+            HomeView(navController = navController, viewModel)
         }
 
         composable(
