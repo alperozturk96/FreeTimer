@@ -7,7 +7,7 @@
     <string name="home_screen_start_timer_button_text">Start Timer</string>
 
 
-    <string name="home_screen_save_workout_alert_title">Save Current Workout Data</string>
+    <string name="home_screen_save_workout_alert_title">Save Workout Data</string>
     <string name="home_screen_save_workout_alert_placeholder">Workout Name</string>
     <string name="home_screen_save_workout_alert_warning_text">Please fill workout data for saving</string>
     <string name="home_screen_save_workout_alert_warning_second_text">Please enter name for workout data</string>
