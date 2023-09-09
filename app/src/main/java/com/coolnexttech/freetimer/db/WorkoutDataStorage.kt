@@ -3,6 +3,7 @@ package com.coolnexttech.freetimer.db
 import android.content.Context
 import androidx.room.Room
 import com.coolnexttech.freetimer.model.WorkoutData
+import java.util.UUID
 
 class WorkoutDataStorage private constructor(context: Context) {
     private val db = Room.databaseBuilder(
@@ -29,7 +30,7 @@ class WorkoutDataStorage private constructor(context: Context) {
         db.insert(workoutData)
     }
 
-    fun findById(id: Int): WorkoutData {
+    fun findById(id: UUID): WorkoutData {
         return db.findById(id)
     }
 

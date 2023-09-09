@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.coolnexttech.freetimer.model.WorkoutData
+import java.util.UUID
 
 @Dao
 interface WorkoutDao {
@@ -12,7 +13,7 @@ interface WorkoutDao {
     fun getAll(): List<WorkoutData>
 
     @Query("SELECT * FROM workoutdata WHERE id IN (:id)")
-    fun findById(id: Int): WorkoutData
+    fun findById(id: UUID): WorkoutData
 
     @Insert
     fun insert(vararg workoutDataList: WorkoutData)

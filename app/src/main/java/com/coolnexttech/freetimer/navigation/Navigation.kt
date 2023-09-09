@@ -19,7 +19,7 @@ import com.google.gson.Gson
 @Composable
 fun Navigation(navController: NavHostController, startDestination: String) {
     NavHost(navController, startDestination) {
-        composable(Destinations.Home) {
+        composable(route = Destinations.Home) {
             val viewModel: HomeViewModel = viewModel()
             HomeView(navController, viewModel)
         }
@@ -30,7 +30,7 @@ fun Navigation(navController: NavHostController, startDestination: String) {
         }
 
         composable(
-            Destinations.CountDown + "/" + "{workoutData}",
+            route = Destinations.CountDown + "/" + "{workoutData}",
             arguments = listOf(navArgument("workoutData") { type = NavType.StringType })
         ) {
             val json = it.arguments?.getString("workoutData")
