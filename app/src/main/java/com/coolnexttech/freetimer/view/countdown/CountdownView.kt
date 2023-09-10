@@ -2,13 +2,10 @@ package com.coolnexttech.freetimer.view.countdown
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -28,6 +24,7 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
+import com.coolnexttech.freetimer.ui.theme.RoundedBox
 import com.coolnexttech.freetimer.util.NotificationService
 import com.coolnexttech.freetimer.util.OnLifecycleEvent
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
@@ -41,7 +38,6 @@ fun CountDownView(
     val context: Context = LocalContext.current
 
     val workoutData by viewModel.workoutData.collectAsState()
-    val isRestModeActive by viewModel.isRestModeActive.collectAsState()
     val isTrainingCompleted by viewModel.isCountDownCompleted.collectAsState()
 
     BackHandler {
@@ -62,7 +58,7 @@ fun CountDownView(
         navigateBackToHome(navController)
     }
 
-    CountDownViewState(workoutData, isRestModeActive)
+    CountDownViewState(workoutData)
 }
 
 @Composable
@@ -89,11 +85,11 @@ private fun navigateBackToHome(navController: NavHostController) {
 }
 
 @Composable
-private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boolean) {
+private fun CountDownViewState(workoutData: WorkoutData) {
     val context: Context = LocalContext.current
     val notificationService = NotificationService(context)
 
-    val timeLeft = if (isRestModeActive) {
+    val timeLeft = if (workoutData.isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + workoutData.restDuration
     } else {
         stringResource(id = R.string.count_down_screen_work_duration_info_text) + workoutData.workDuration
@@ -116,15 +112,12 @@ private fun CountDownViewState(workoutData: WorkoutData, isRestModeActive: Boole
 
 @Composable
 private fun InfoText(text: String) {
-    Text(
-        text = text,
-        color = Color.White,
-        fontFamily = MaterialTheme.typography.displayLarge.fontFamily,
-        fontSize = 48.sp,
-        modifier = Modifier
-            .padding(all = 20.dp)
-            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 15.dp, 15.dp))
-            .background(Color.Black.copy(alpha = 0.8f))
-            .padding(all = 20.dp),
-    )
+    RoundedBox {
+        Text(
+            text = text,
+            color = Color.Black,
+            fontFamily = MaterialTheme.typography.displayLarge.fontFamily,
+            fontSize = 20.sp,
+        )
+    }
 }

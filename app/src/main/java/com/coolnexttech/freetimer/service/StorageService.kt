@@ -11,12 +11,12 @@ class StorageService(context: Context) {
 
     private val gson = Gson()
     private val tempWorkoutDataKey = "temp_workout_data"
+    private val whenAppInBackgroundKey = "when_app_in_background"
 
     @SuppressLint("ApplySharedPref")
     fun saveTempWorkoutData(workoutData: WorkoutData) {
         val json = gson.toJson(workoutData)
-        editor.putString(tempWorkoutDataKey, json)
-        editor.commit()
+        editor.putString(tempWorkoutDataKey, json).commit()
     }
 
     fun readTempWorkoutData(): WorkoutData? {
@@ -24,7 +24,15 @@ class StorageService(context: Context) {
         return Gson().fromJson(json, WorkoutData::class.java)
     }
 
-    fun removeTempWorkoutData() {
+    fun saveWhenAppInBackground(time: Long) {
+        editor.putLong(whenAppInBackgroundKey, time).commit()
+    }
+
+    fun readWhenAppInForeground(): Long {
+        return sharedPreferences.getLong(whenAppInBackgroundKey, System.currentTimeMillis())
+    }
+
+    fun removeTempData() {
         editor.clear().apply()
     }
 }

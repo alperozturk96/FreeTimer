@@ -20,9 +20,6 @@ class CountDownViewModel : ViewModel() {
     private val _isCountdownCompleted = MutableStateFlow(false)
     val isCountDownCompleted = _isCountdownCompleted.asStateFlow()
 
-    private val _isRestModeActive = MutableStateFlow(false)
-    val isRestModeActive = _isRestModeActive.asStateFlow()
-
     private val _workoutData = MutableStateFlow(WorkoutData())
     val workoutData = _workoutData.asStateFlow()
     // endregion
@@ -47,33 +44,45 @@ class CountDownViewModel : ViewModel() {
     private fun startCountDown() {
         viewModelScope.launch(Dispatchers.Main) {
             while (true) {
-                if (_isRestModeActive.value) {
-                    handleRestMode()
-                } else {
-                    handleWorkoutMode()
-                }
-
+                handleWorkoutData()
                 delay(1000)
             }
+        }
+    }
+
+    private fun handleWorkoutData() {
+        if (_workoutData.value.isRestModeActive) {
+            handleRestMode()
+        } else {
+            handleWorkoutMode()
         }
     }
 
     // region Handle Lifecycle Changes & Update Workout Data
     fun saveTempWorkoutData() {
         storageService?.saveTempWorkoutData(_workoutData.value)
+        storageService?.saveWhenAppInBackground(System.currentTimeMillis())
         println("Temp Workout Data Saved")
     }
 
     fun updateWorkoutDataWithTempWorkoutData() {
         val tempWorkoutData = storageService?.readTempWorkoutData() ?: return
+        val timeDiffInMilliSecond = storageService?.readWhenAppInForeground() ?: return
+        val timeDiffInSecond = (timeDiffInMilliSecond / 1000).toInt()
+
+        println("Time Difference In Second: $timeDiffInSecond")
         _workoutData.update {
             tempWorkoutData
+        }
+
+        repeat(timeDiffInSecond) {
+            handleWorkoutData()
         }
         println("Workout Data updated with Temp Workout Data")
     }
 
     fun removeTempWorkoutData() {
-        storageService?.removeTempWorkoutData()
+        storageService?.removeTempData()
     }
     // endregion
 
@@ -89,11 +98,9 @@ class CountDownViewModel : ViewModel() {
     }
 
     private fun startNextSet() {
-        _isRestModeActive.update {
-            false
-        }
         _workoutData.update {
             it.copy(
+                isRestModeActive = false,
                 setCount = _workoutData.value.setCount - 1,
                 workDuration = _initialWorkoutDuration,
                 restDuration = _initialRestDuration
@@ -127,8 +134,8 @@ class CountDownViewModel : ViewModel() {
 
     private fun switchToRestMode() {
         musicPlayer?.playAudio(R.raw.boxing_bell)
-        _isRestModeActive.update {
-            true
+        _workoutData.update {
+            it.copy(isRestModeActive = true)
         }
     }
     // endregion
