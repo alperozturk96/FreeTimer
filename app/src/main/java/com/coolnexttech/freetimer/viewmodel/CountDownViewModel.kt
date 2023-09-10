@@ -58,6 +58,10 @@ class CountDownViewModel : ViewModel() {
         }
     }
 
+    fun disableMediaPlayer() {
+        mediaPlayerManager?.canPlay = false
+    }
+
     // region Handle Lifecycle Changes & Update Workout Data
     fun saveTempWorkoutData() {
         storageManager?.saveTempWorkoutData(_workoutData.value)
@@ -70,7 +74,6 @@ class CountDownViewModel : ViewModel() {
         val whenAppInForeground = storageManager?.readWhenAppInForeground() ?: return
         val timeDiffInMilliSecond = System.currentTimeMillis() - whenAppInForeground
         val timeDiffInSecond = (timeDiffInMilliSecond / 1000L).toInt()
-        mediaPlayerManager?.canPlay = false
 
         println("Time Difference In Second: $timeDiffInSecond")
         _workoutData.update {

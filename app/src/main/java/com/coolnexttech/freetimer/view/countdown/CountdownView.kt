@@ -76,6 +76,8 @@ private fun ObserveWorkoutData(context: Context, viewModel: CountDownViewModel) 
                 serviceIntent.action = MusicPlayerService.Actions.Start.toString()
                 serviceIntent.putExtra(MusicPlayerService.serviceWorkoutData, viewModel.workoutData.value.toJson())
                 context.startService(serviceIntent)
+
+                viewModel.disableMediaPlayer()
             }
             Lifecycle.Event.ON_START -> {
                 serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
