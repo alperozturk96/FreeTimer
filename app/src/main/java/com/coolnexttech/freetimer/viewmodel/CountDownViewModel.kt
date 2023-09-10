@@ -8,8 +8,12 @@ import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.manager.StorageManager
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,7 +24,7 @@ class CountDownViewModel : ViewModel() {
     private val _isCountdownCompleted = MutableStateFlow(false)
     val isCountDownCompleted = _isCountdownCompleted.asStateFlow()
 
-    private val _workoutData = MutableStateFlow(WorkoutData())
+    private val _workoutData = NoCompareMutableStateFlow(WorkoutData())
     val workoutData = _workoutData.asStateFlow()
     // endregion
 
@@ -43,7 +47,7 @@ class CountDownViewModel : ViewModel() {
 
     private fun startCountDown() {
         viewModelScope.launch(Dispatchers.Main) {
-            while (true) {
+            while (!_isCountdownCompleted.value) {
                 _workoutData.value.print()
                 handleWorkoutData()
                 delay(1000)
@@ -61,6 +65,19 @@ class CountDownViewModel : ViewModel() {
 
     fun disableMediaPlayer() {
         mediaPlayerManager?.canPlay = false
+    }
+
+    private fun releaseMediaPlayer() {
+        disableMediaPlayer()
+        mediaPlayerManager = null
+    }
+
+    fun finishCountDown() {
+        _isCountdownCompleted.update {
+            true
+        }
+        releaseMediaPlayer()
+        removeTempWorkoutData()
     }
 
     // region Handle Lifecycle Changes & Update Workout Data
@@ -89,7 +106,7 @@ class CountDownViewModel : ViewModel() {
         println("Workout Data updated with Temp Workout Data")
     }
 
-    fun removeTempWorkoutData() {
+    private fun removeTempWorkoutData() {
         storageManager?.removeTempData()
     }
     // endregion
@@ -117,14 +134,7 @@ class CountDownViewModel : ViewModel() {
         mediaPlayerManager?.playAudio(R.raw.boxing_bell)
 
         if (_workoutData.value.isWorkoutFinished()) {
-            stopCountdown()
-        }
-    }
-
-    private fun stopCountdown() {
-        mediaPlayerManager?.stopAudio()
-        _isCountdownCompleted.update {
-            true
+            finishCountDown()
         }
     }
     // endregion
@@ -147,4 +157,37 @@ class CountDownViewModel : ViewModel() {
         }
     }
     // endregion
+}
+
+class NoCompareMutableStateFlow<T>(
+    value: T
+) : MutableStateFlow<T> {
+
+    override var value: T = value
+        set(value) {
+            field = value
+            innerFlow.tryEmit(value)
+        }
+
+    private val innerFlow = MutableSharedFlow<T>(replay = 1)
+
+    override fun compareAndSet(expect: T, update: T): Boolean {
+        value = update
+        return true
+    }
+
+    override suspend fun emit(value: T) {
+        this.value = value
+    }
+
+    override fun tryEmit(value: T): Boolean {
+        this.value = value
+        return true
+    }
+
+    override val subscriptionCount: StateFlow<Int> = innerFlow.subscriptionCount
+    @ExperimentalCoroutinesApi
+    override fun resetReplayCache() = innerFlow.resetReplayCache()
+    override suspend fun collect(collector: FlowCollector<T>): Nothing = innerFlow.collect(collector)
+    override val replayCache: List<T> = innerFlow.replayCache
 }

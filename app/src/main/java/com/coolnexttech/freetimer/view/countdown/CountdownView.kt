@@ -40,17 +40,19 @@ fun CountDownView(
 ) {
     val context: Context = LocalContext.current
     val notificationManager = CountdownTimerNotificationManager(context)
-
+    val serviceIntent = Intent(context, MusicPlayerService::class.java)
     val workoutData by viewModel.workoutData.collectAsState()
-    val isTrainingCompleted by viewModel.isCountDownCompleted.collectAsState()
+    val isCountDownCompleted by viewModel.isCountDownCompleted.collectAsState()
 
+    // TODO FIX Service keeps running
     BackHandler {
-        viewModel.removeTempWorkoutData()
+        viewModel.finishCountDown()
         notificationManager.deleteNotificationChannel()
+        stopMusicPlayerService(context, serviceIntent)
         navController.popBackStack()
     }
 
-    ObserveWorkoutData(context, viewModel)
+    ObserveWorkoutData(context, serviceIntent, workoutData, viewModel)
 
     DisposableEffect(Unit) {
         viewModel.init(initialWorkoutData, context)
@@ -59,7 +61,7 @@ fun CountDownView(
         }
     }
 
-    if (isTrainingCompleted) {
+    if (isCountDownCompleted) {
         navigateBackToHome(navController)
     }
 
@@ -67,29 +69,33 @@ fun CountDownView(
 }
 
 @Composable
-private fun ObserveWorkoutData(context: Context, viewModel: CountDownViewModel) {
-    val serviceIntent = Intent(context, MusicPlayerService::class.java)
+private fun ObserveWorkoutData(context: Context, serviceIntent: Intent, workoutData: WorkoutData, viewModel: CountDownViewModel) {
 
     LifecycleEventListener { _, event ->
         when (event) {
             Lifecycle.Event.ON_PAUSE -> {
                 viewModel.saveTempWorkoutData()
-
-                serviceIntent.action = MusicPlayerService.Actions.Start.toString()
-                serviceIntent.putExtra(MusicPlayerService.serviceWorkoutData, viewModel.workoutData.value.toJson())
-                context.startService(serviceIntent)
-
+                startMusicPlayerService(context, serviceIntent, workoutData)
                 viewModel.disableMediaPlayer()
             }
             Lifecycle.Event.ON_START -> {
-                serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
-                context.stopService(serviceIntent)
-
+                stopMusicPlayerService(context, serviceIntent)
                 viewModel.updateWorkoutDataWithTempWorkoutData()
             }
             else -> {}
         }
     }
+}
+
+private fun startMusicPlayerService(context: Context, serviceIntent: Intent, workoutData: WorkoutData) {
+    serviceIntent.action = MusicPlayerService.Actions.Start.toString()
+    serviceIntent.putExtra(MusicPlayerService.serviceWorkoutData, workoutData.toJson())
+    context.startService(serviceIntent)
+}
+
+private fun stopMusicPlayerService(context: Context, serviceIntent: Intent) {
+    serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
+    context.stopService(serviceIntent)
 }
 
 private fun navigateBackToHome(navController: NavHostController) {

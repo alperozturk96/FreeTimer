@@ -37,6 +37,8 @@ class MusicPlayerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        println("MusicPlayerService Started")
+
         val json = intent?.getStringExtra(serviceWorkoutData)
         workoutData = json?.toWorkoutData() ?: return START_STICKY
         _initialWorkoutDuration = workoutData.workDuration
@@ -71,7 +73,8 @@ class MusicPlayerService : Service() {
         setWakeLock()
 
         scope.launch {
-            while (true) {
+            while (!workoutData.isWorkoutFinished()) {
+                println("MusicPlayerService Running")
                 workoutData.print()
 
                 if (workoutData.isRestModeActive) {
