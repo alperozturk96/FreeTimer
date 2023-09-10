@@ -55,6 +55,16 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
     val workoutData: WorkoutData by viewModel.workoutData.collectAsState()
     val showSaveWorkoutAlert by viewModel.showSaveWorkoutAlert.collectAsState()
 
+    var setCountText by remember {
+        mutableStateOf("")
+    }
+    var workoutDurationText by remember {
+        mutableStateOf("")
+    }
+    var restDurationText by remember {
+        mutableStateOf("")
+    }
+
     val context = LocalContext.current
 
     DisposableEffect(Unit) {
@@ -96,16 +106,22 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
-            TimerInput(label = stringResource(id = R.string.home_screen_set_count_input_placeholder), onValueChange = {
+            TimerInput(setCountText, label = stringResource(id = R.string.home_screen_set_count_input_placeholder), onValueChange = {
                 workoutData.setCount = it
+            }, updateText = {
+                setCountText = it
             })
 
-            TimerInput(label = stringResource(id = R.string.home_screen_workout_duration_input_placeholder), onValueChange = {
+            TimerInput(workoutDurationText, label = stringResource(id = R.string.home_screen_workout_duration_input_placeholder), onValueChange = {
                 workoutData.workDuration = it
+            }, updateText = {
+                workoutDurationText = it
             })
 
-            TimerInput(label = stringResource(id = R.string.home_screen_rest_duration_input_placeholder), onValueChange = {
+            TimerInput(restDurationText, label = stringResource(id = R.string.home_screen_rest_duration_input_placeholder), onValueChange = {
                 workoutData.restDuration = it
+            }, updateText = {
+                restDurationText = it
             })
 
             Button(onClick = {
@@ -118,13 +134,18 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
         }
 
         if (showSaveWorkoutAlert) {
-            SaveWorkoutAlertDialog(context, viewModel)
+            SaveWorkoutAlertDialog(context, viewModel, saveWorkoutData = {
+                setCountText = ""
+                workoutDurationText = ""
+                restDurationText = ""
+                viewModel.saveWorkout()
+            })
         }
     }
 }
 
 @Composable
-private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel) {
+private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel, saveWorkoutData: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var warningMessage: String? = null
 
@@ -165,7 +186,7 @@ private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel) {
                 if (warningMessage != null) {
                     Toast.makeText(context, warningMessage, Toast.LENGTH_SHORT).show()
                 } else {
-                    viewModel.saveWorkout()
+                    saveWorkoutData()
                 }
             }) {
                 Text(stringResource(id = R.string.home_screen_save_workout_alert_confirm_button_text), color = Color.Black)
@@ -181,12 +202,11 @@ private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel) {
 
 @Composable
 private fun TimerInput(
-    label: String, onValueChange: (Int) -> Unit
+    text: String,
+    label: String,
+    updateText: (String) -> Unit,
+    onValueChange: (Int) -> Unit
 ) {
-    var text by remember {
-        mutableStateOf("")
-    }
-
     OutlinedTextField(colors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color.Black,
         unfocusedBorderColor = BorderColor,
@@ -198,7 +218,8 @@ private fun TimerInput(
         onValueChange = { value ->
             if (value.length <= 3) {
                 val sanitizedValue = value.replace(Regex("[^0-9]"), "")
-                text = sanitizedValue.filter { it.isDigit() }
+                val updatedText = sanitizedValue.filter { it.isDigit() }
+                updateText(updatedText)
                 try {
                     onValueChange(sanitizedValue.toInt())
                 } catch (_: Throwable) {

@@ -47,6 +47,9 @@ class HomeViewModel: ViewModel() {
             workoutDataStorage?.add(_workoutData.value)
 
             launch(Dispatchers.Main) {
+                _workoutData.update {
+                    WorkoutData()
+                }
                 hideSaveWorkoutAlert()
             }
         }
