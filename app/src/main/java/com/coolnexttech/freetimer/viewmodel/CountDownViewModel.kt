@@ -67,8 +67,10 @@ class CountDownViewModel : ViewModel() {
 
     fun updateWorkoutDataWithTempWorkoutData() {
         val tempWorkoutData = storageService?.readTempWorkoutData() ?: return
-        val timeDiffInMilliSecond = storageService?.readWhenAppInForeground() ?: return
-        val timeDiffInSecond = (timeDiffInMilliSecond / 1000).toInt()
+        val whenAppInForeground = storageService?.readWhenAppInForeground() ?: return
+        val timeDiffInMilliSecond = System.currentTimeMillis() - whenAppInForeground
+        val timeDiffInSecond = (timeDiffInMilliSecond / 1000L).toInt()
+        musicPlayer?.canPlay = false
 
         println("Time Difference In Second: $timeDiffInSecond")
         _workoutData.update {
@@ -78,6 +80,8 @@ class CountDownViewModel : ViewModel() {
         repeat(timeDiffInSecond) {
             handleWorkoutData()
         }
+
+        musicPlayer?.canPlay = true
         println("Workout Data updated with Temp Workout Data")
     }
 
