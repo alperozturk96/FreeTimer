@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.manager.StorageManager
-import com.coolnexttech.freetimer.util.MusicPlayer
+import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ class CountDownViewModel : ViewModel() {
 
     // region Dependencies
     private var storageManager: StorageManager? = null
-    private var musicPlayer: MusicPlayer? = null
+    private var mediaPlayerManager: MediaPlayerManager? = null
     private var _initialWorkoutDuration = 0
     private var _initialRestDuration = 0
     // endregion
@@ -35,7 +35,7 @@ class CountDownViewModel : ViewModel() {
         _workoutData.value = workoutData
         _initialWorkoutDuration = workoutData.workDuration
         _initialRestDuration = workoutData.restDuration
-        musicPlayer = MusicPlayer(context)
+        mediaPlayerManager = MediaPlayerManager(context)
         storageManager = StorageManager(context)
 
         startCountDown()
@@ -70,7 +70,7 @@ class CountDownViewModel : ViewModel() {
         val whenAppInForeground = storageManager?.readWhenAppInForeground() ?: return
         val timeDiffInMilliSecond = System.currentTimeMillis() - whenAppInForeground
         val timeDiffInSecond = (timeDiffInMilliSecond / 1000L).toInt()
-        musicPlayer?.canPlay = false
+        mediaPlayerManager?.canPlay = false
 
         println("Time Difference In Second: $timeDiffInSecond")
         _workoutData.update {
@@ -81,7 +81,7 @@ class CountDownViewModel : ViewModel() {
             handleWorkoutData()
         }
 
-        musicPlayer?.canPlay = true
+        mediaPlayerManager?.canPlay = true
         println("Workout Data updated with Temp Workout Data")
     }
 
@@ -110,7 +110,7 @@ class CountDownViewModel : ViewModel() {
                 restDuration = _initialRestDuration
             )
         }
-        musicPlayer?.playAudio(R.raw.boxing_bell)
+        mediaPlayerManager?.playAudio(R.raw.boxing_bell)
 
         if (_workoutData.value.isWorkoutFinished()) {
             stopCountdown()
@@ -118,7 +118,7 @@ class CountDownViewModel : ViewModel() {
     }
 
     private fun stopCountdown() {
-        musicPlayer?.stopAudio()
+        mediaPlayerManager?.stopAudio()
         _isCountdownCompleted.update {
             true
         }
@@ -137,7 +137,7 @@ class CountDownViewModel : ViewModel() {
     }
 
     private fun switchToRestMode() {
-        musicPlayer?.playAudio(R.raw.boxing_bell)
+        mediaPlayerManager?.playAudio(R.raw.boxing_bell)
         _workoutData.update {
             it.copy(isRestModeActive = true)
         }

@@ -1,6 +1,7 @@
 package com.coolnexttech.freetimer.view.countdown
 
 import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,8 @@ import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
+import com.coolnexttech.freetimer.model.toJson
+import com.coolnexttech.freetimer.service.MusicPlayerService
 import com.coolnexttech.freetimer.ui.component.LifecycleEventListener
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 
@@ -45,7 +48,7 @@ fun CountDownView(
         navController.popBackStack()
     }
 
-    ObserveWorkoutData(viewModel)
+    ObserveWorkoutData(context, viewModel)
 
     DisposableEffect(Unit) {
         viewModel.init(initialWorkoutData, context)
@@ -62,13 +65,22 @@ fun CountDownView(
 }
 
 @Composable
-private fun ObserveWorkoutData(viewModel: CountDownViewModel) {
+private fun ObserveWorkoutData(context: Context, viewModel: CountDownViewModel) {
+    val serviceIntent = Intent(context, MusicPlayerService::class.java)
+
     LifecycleEventListener { _, event ->
         when (event) {
             Lifecycle.Event.ON_PAUSE -> {
                 viewModel.saveTempWorkoutData()
+
+                serviceIntent.action = MusicPlayerService.Actions.Start.toString()
+                serviceIntent.putExtra(MusicPlayerService.serviceWorkoutData, viewModel.workoutData.value.toJson())
+                context.startService(serviceIntent)
             }
             Lifecycle.Event.ON_START -> {
+                serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
+                context.stopService(serviceIntent)
+
                 viewModel.updateWorkoutDataWithTempWorkoutData()
             }
             else -> {}

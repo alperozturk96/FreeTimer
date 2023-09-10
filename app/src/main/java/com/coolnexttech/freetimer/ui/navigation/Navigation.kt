@@ -8,13 +8,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.coolnexttech.freetimer.model.WorkoutData
+import com.coolnexttech.freetimer.model.toWorkoutData
 import com.coolnexttech.freetimer.view.countdown.CountDownView
 import com.coolnexttech.freetimer.view.home.HomeView
 import com.coolnexttech.freetimer.view.workoutDataList.WorkoutDataListView
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 import com.coolnexttech.freetimer.viewmodel.HomeViewModel
 import com.coolnexttech.freetimer.viewmodel.WorkoutDataListViewModel
-import com.google.gson.Gson
 
 @Composable
 fun Navigation(navController: NavHostController, startDestination: String) {
@@ -34,7 +34,7 @@ fun Navigation(navController: NavHostController, startDestination: String) {
             arguments = listOf(navArgument("workoutData") { type = NavType.StringType })
         ) {
             val json = it.arguments?.getString("workoutData")
-            val workoutData = Gson().fromJson(json, WorkoutData::class.java)
+            val workoutData = json?.toWorkoutData() ?: WorkoutData()
             val viewModel: CountDownViewModel = viewModel()
             CountDownView(navController, viewModel, workoutData)
         }

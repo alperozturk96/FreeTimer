@@ -3,25 +3,24 @@ package com.coolnexttech.freetimer.manager
 import android.annotation.SuppressLint
 import android.content.Context
 import com.coolnexttech.freetimer.model.WorkoutData
-import com.google.gson.Gson
+import com.coolnexttech.freetimer.model.toJson
+import com.coolnexttech.freetimer.model.toWorkoutData
 
 class StorageManager(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("FreeTimer", Context.MODE_PRIVATE)
     private val editor = sharedPreferences.edit()
 
-    private val gson = Gson()
     private val tempWorkoutDataKey = "temp_workout_data"
     private val whenAppInBackgroundKey = "when_app_in_background"
 
     @SuppressLint("ApplySharedPref")
     fun saveTempWorkoutData(workoutData: WorkoutData) {
-        val json = gson.toJson(workoutData)
-        editor.putString(tempWorkoutDataKey, json).commit()
+        editor.putString(tempWorkoutDataKey, workoutData.toJson()).commit()
     }
 
     fun readTempWorkoutData(): WorkoutData? {
         val json = sharedPreferences.getString(tempWorkoutDataKey, null) ?: return null
-        return Gson().fromJson(json, WorkoutData::class.java)
+        return json.toWorkoutData()
     }
 
     fun saveWhenAppInBackground(time: Long) {

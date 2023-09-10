@@ -1,9 +1,9 @@
-package com.coolnexttech.freetimer.util
+package com.coolnexttech.freetimer.manager
 
 import android.content.Context
 import android.media.MediaPlayer
 
-class MusicPlayer(private val context: Context) {
+class MediaPlayerManager(private val context: Context) {
     private var mediaPlayer: MediaPlayer? = null
     var canPlay = true
 

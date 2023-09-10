@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.model.WorkoutData
-import com.google.gson.Gson
+import com.coolnexttech.freetimer.model.toJson
 
 object Destinations {
     const val Home = "Home"
@@ -17,8 +17,7 @@ object Destinations {
         navController: NavHostController
     ) {
         if (workoutData.isValid()) {
-            val json = Gson().toJson(workoutData)
-            navController.navigate(CountDown + "/" + json)
+            navController.navigate("$CountDown/${workoutData.toJson()}")
         } else {
             Toast.makeText(context, "Please enter valid workout duration", Toast.LENGTH_SHORT)
                 .show()

@@ -3,6 +3,7 @@ package com.coolnexttech.freetimer.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.Gson
 import java.util.UUID
 
 @Entity
@@ -29,4 +30,12 @@ data class WorkoutData(
     fun isWorkoutFinished(): Boolean {
         return setCount == 0
     }
+}
+
+fun WorkoutData.toJson(): String {
+    return Gson().toJson(this)
+}
+
+fun String.toWorkoutData(): WorkoutData {
+    return Gson().fromJson(this, WorkoutData::class.java)
 }
