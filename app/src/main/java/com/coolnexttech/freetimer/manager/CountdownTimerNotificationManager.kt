@@ -12,6 +12,8 @@ class CountdownTimerNotificationManager(private val context: Context) {
     private val notificationId = 1
 
     private val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val importance = NotificationManager.IMPORTANCE_DEFAULT
+    private val channel = NotificationChannel(channelId, notificationName, importance)
 
     fun createNotification(timeLeft: String) {
         val notification = NotificationCompat.Builder(context, channelId)
@@ -25,8 +27,11 @@ class CountdownTimerNotificationManager(private val context: Context) {
     }
 
     fun createNotificationChannel() {
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(channelId, notificationName, importance)
         nm.createNotificationChannel(channel)
+    }
+
+    fun deleteNotificationChannel() {
+        nm.cancelAll()
+        nm.deleteNotificationChannel(channelId)
     }
 }

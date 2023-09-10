@@ -15,6 +15,14 @@ data class WorkoutData(
     @ColumnInfo(name = "work_duration") var workDuration: Int = 0,
     @ColumnInfo(name = "rest_duration") var restDuration: Int = 0,
 ) {
+    fun print() {
+        println("Workout Name: $name")
+        println("Workout RestMode : $isRestModeActive")
+        println("Workout Set: $setCount")
+        println("Workout WorkDuration: $workDuration")
+        println("Workout RestDuration: $restDuration")
+    }
+
     fun isValid(): Boolean {
         return setCount > 0 && workDuration > 0 && restDuration > 0
     }

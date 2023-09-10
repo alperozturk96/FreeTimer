@@ -72,6 +72,8 @@ class MusicPlayerService : Service() {
 
         scope.launch {
             while (true) {
+                workoutData.print()
+
                 if (workoutData.isRestModeActive) {
                     workoutData.restDuration -= 1
                     if (workoutData.isCurrentSetRestFinished()) {

@@ -44,6 +44,7 @@ class CountDownViewModel : ViewModel() {
     private fun startCountDown() {
         viewModelScope.launch(Dispatchers.Main) {
             while (true) {
+                _workoutData.value.print()
                 handleWorkoutData()
                 delay(1000)
             }

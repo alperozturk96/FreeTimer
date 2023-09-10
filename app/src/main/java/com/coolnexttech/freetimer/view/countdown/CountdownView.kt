@@ -39,12 +39,14 @@ fun CountDownView(
     initialWorkoutData: WorkoutData
 ) {
     val context: Context = LocalContext.current
+    val notificationManager = CountdownTimerNotificationManager(context)
 
     val workoutData by viewModel.workoutData.collectAsState()
     val isTrainingCompleted by viewModel.isCountDownCompleted.collectAsState()
 
     BackHandler {
         viewModel.removeTempWorkoutData()
+        notificationManager.deleteNotificationChannel()
         navController.popBackStack()
     }
 
@@ -61,7 +63,7 @@ fun CountDownView(
         navigateBackToHome(navController)
     }
 
-    CountDownViewState(workoutData)
+    CountDownViewState(workoutData, notificationManager)
 }
 
 @Composable
@@ -99,9 +101,7 @@ private fun navigateBackToHome(navController: NavHostController) {
 }
 
 @Composable
-private fun CountDownViewState(workoutData: WorkoutData) {
-    val context: Context = LocalContext.current
-    val countdownTimerNotificationManager = CountdownTimerNotificationManager(context)
+private fun CountDownViewState(workoutData: WorkoutData, notificationManager: CountdownTimerNotificationManager) {
 
     val timeLeft = if (workoutData.isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + workoutData.restDuration
@@ -109,8 +109,8 @@ private fun CountDownViewState(workoutData: WorkoutData) {
         stringResource(id = R.string.count_down_screen_work_duration_info_text) + workoutData.workDuration
     }
 
-    countdownTimerNotificationManager.createNotificationChannel()
-    countdownTimerNotificationManager.createNotification(timeLeft)
+    notificationManager.createNotificationChannel()
+    notificationManager.createNotification(timeLeft)
 
     Column(
         modifier = Modifier.fillMaxSize(),
