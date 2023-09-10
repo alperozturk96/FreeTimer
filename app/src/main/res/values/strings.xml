@@ -22,4 +22,6 @@
     <string name="count_down_screen_delete_workout_confirm_button">Delete</string>
     <string name="count_down_screen_delete_workout_dismiss_button">Cancel</string>
 
+    <string name="workout_data_list_screen_no_workout_data_text">No Workout Data</string>
+
 </resources>

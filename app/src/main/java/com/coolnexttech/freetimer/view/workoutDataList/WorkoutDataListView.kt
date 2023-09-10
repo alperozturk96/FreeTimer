@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
@@ -55,11 +56,15 @@ fun WorkoutDataListView(navController: NavHostController, viewModel: WorkoutData
         onDispose { }
     }
 
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
-        items(workoutDataList) { item ->
-            WorkoutDataListItemView(item, context, navController) {
-                showDeleteAlert = true
-                selectedWorkoutData = item
+    if (workoutDataList.isEmpty()) {
+        NoWorkoutDataText()
+    } else {
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            items(workoutDataList) { item ->
+                WorkoutDataListItemView(item, context, navController) {
+                    showDeleteAlert = true
+                    selectedWorkoutData = item
+                }
             }
         }
     }
@@ -68,6 +73,13 @@ fun WorkoutDataListView(navController: NavHostController, viewModel: WorkoutData
         DeleteWorkoutDataAlertDialog(viewModel, selectedWorkoutData) {
             showDeleteAlert = false
         }
+    }
+}
+
+@Composable
+private fun NoWorkoutDataText() {
+    Box(contentAlignment = Alignment.Center) {
+        Text(text = stringResource(id = R.string.workout_data_list_screen_no_workout_data_text), color = Color.Black, fontSize = 20.sp)
     }
 }
 
