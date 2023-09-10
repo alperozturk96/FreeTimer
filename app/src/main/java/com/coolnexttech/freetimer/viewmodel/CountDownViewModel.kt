@@ -55,6 +55,7 @@ class CountDownViewModel : ViewModel() {
         }
     }
 
+    // TODO Use Single Source of Truth
     private fun handleWorkoutData() {
         if (_workoutData.value.isRestModeActive) {
             handleRestMode()

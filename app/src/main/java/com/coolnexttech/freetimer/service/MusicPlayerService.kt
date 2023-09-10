@@ -77,6 +77,7 @@ class MusicPlayerService : Service() {
                 println("MusicPlayerService Running")
                 workoutData.print()
 
+                // TODO Use Single Source of Truth
                 if (workoutData.isRestModeActive) {
                     workoutData.restDuration -= 1
                     if (workoutData.isCurrentSetRestFinished()) {
