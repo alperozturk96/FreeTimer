@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.navigation
+package com.coolnexttech.freetimer.ui.navigation
 
 import android.content.Context
 import android.widget.Toast
@@ -18,7 +18,7 @@ object Destinations {
     ) {
         if (workoutData.isValid()) {
             val json = Gson().toJson(workoutData)
-            navController.navigate(Destinations.CountDown + "/" + json)
+            navController.navigate(CountDown + "/" + json)
         } else {
             Toast.makeText(context, "Please enter valid workout duration", Toast.LENGTH_SHORT)
                 .show()

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
-import com.coolnexttech.freetimer.service.StorageService
+import com.coolnexttech.freetimer.manager.StorageManager
 import com.coolnexttech.freetimer.util.MusicPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -25,7 +25,7 @@ class CountDownViewModel : ViewModel() {
     // endregion
 
     // region Dependencies
-    private var storageService: StorageService? = null
+    private var storageManager: StorageManager? = null
     private var musicPlayer: MusicPlayer? = null
     private var _initialWorkoutDuration = 0
     private var _initialRestDuration = 0
@@ -36,7 +36,7 @@ class CountDownViewModel : ViewModel() {
         _initialWorkoutDuration = workoutData.workDuration
         _initialRestDuration = workoutData.restDuration
         musicPlayer = MusicPlayer(context)
-        storageService = StorageService(context)
+        storageManager = StorageManager(context)
 
         startCountDown()
     }
@@ -60,14 +60,14 @@ class CountDownViewModel : ViewModel() {
 
     // region Handle Lifecycle Changes & Update Workout Data
     fun saveTempWorkoutData() {
-        storageService?.saveTempWorkoutData(_workoutData.value)
-        storageService?.saveWhenAppInBackground(System.currentTimeMillis())
+        storageManager?.saveTempWorkoutData(_workoutData.value)
+        storageManager?.saveWhenAppInBackground(System.currentTimeMillis())
         println("Temp Workout Data Saved")
     }
 
     fun updateWorkoutDataWithTempWorkoutData() {
-        val tempWorkoutData = storageService?.readTempWorkoutData() ?: return
-        val whenAppInForeground = storageService?.readWhenAppInForeground() ?: return
+        val tempWorkoutData = storageManager?.readTempWorkoutData() ?: return
+        val whenAppInForeground = storageManager?.readWhenAppInForeground() ?: return
         val timeDiffInMilliSecond = System.currentTimeMillis() - whenAppInForeground
         val timeDiffInSecond = (timeDiffInMilliSecond / 1000L).toInt()
         musicPlayer?.canPlay = false
@@ -86,7 +86,7 @@ class CountDownViewModel : ViewModel() {
     }
 
     fun removeTempWorkoutData() {
-        storageService?.removeTempData()
+        storageManager?.removeTempData()
     }
     // endregion
 

@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.navigation
+package com.coolnexttech.freetimer.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel

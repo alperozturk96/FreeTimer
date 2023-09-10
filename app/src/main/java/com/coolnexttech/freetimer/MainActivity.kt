@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
-import com.coolnexttech.freetimer.navigation.Destinations
-import com.coolnexttech.freetimer.navigation.Navigation
+import com.coolnexttech.freetimer.ui.navigation.Destinations
+import com.coolnexttech.freetimer.ui.navigation.Navigation
 import com.coolnexttech.freetimer.ui.theme.FreeTimerTheme
 
 class MainActivity : ComponentActivity() {

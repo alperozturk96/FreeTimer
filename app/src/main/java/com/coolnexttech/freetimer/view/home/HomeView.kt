@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
-import com.coolnexttech.freetimer.navigation.Destinations
+import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.ui.theme.BorderColor
 import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 import com.coolnexttech.freetimer.viewmodel.HomeViewModel

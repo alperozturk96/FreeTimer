@@ -1,11 +1,11 @@
-package com.coolnexttech.freetimer.service
+package com.coolnexttech.freetimer.manager
 
 import android.annotation.SuppressLint
 import android.content.Context
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.google.gson.Gson
 
-class StorageService(context: Context) {
+class StorageManager(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("FreeTimer", Context.MODE_PRIVATE)
     private val editor = sharedPreferences.edit()
 

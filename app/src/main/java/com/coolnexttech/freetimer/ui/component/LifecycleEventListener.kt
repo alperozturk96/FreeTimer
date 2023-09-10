@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.util
+package com.coolnexttech.freetimer.ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 
 @Composable
-fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
+fun LifecycleEventListener(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
     val eventHandler = rememberUpdatedState(onEvent)
     val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
 

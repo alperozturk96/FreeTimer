@@ -23,10 +23,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
-import com.coolnexttech.freetimer.navigation.Destinations
+import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.ui.component.RoundedBox
-import com.coolnexttech.freetimer.util.NotificationService
-import com.coolnexttech.freetimer.util.OnLifecycleEvent
+import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
+import com.coolnexttech.freetimer.ui.component.LifecycleEventListener
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 
 @Composable
@@ -63,7 +63,7 @@ fun CountDownView(
 
 @Composable
 private fun ObserveWorkoutData(viewModel: CountDownViewModel) {
-    OnLifecycleEvent { _, event ->
+    LifecycleEventListener { _, event ->
         when (event) {
             Lifecycle.Event.ON_PAUSE -> {
                 viewModel.saveTempWorkoutData()
@@ -87,7 +87,7 @@ private fun navigateBackToHome(navController: NavHostController) {
 @Composable
 private fun CountDownViewState(workoutData: WorkoutData) {
     val context: Context = LocalContext.current
-    val notificationService = NotificationService(context)
+    val countdownTimerNotificationManager = CountdownTimerNotificationManager(context)
 
     val timeLeft = if (workoutData.isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + workoutData.restDuration
@@ -95,8 +95,8 @@ private fun CountDownViewState(workoutData: WorkoutData) {
         stringResource(id = R.string.count_down_screen_work_duration_info_text) + workoutData.workDuration
     }
 
-    notificationService.createNotificationChannel()
-    notificationService.createNotification(timeLeft)
+    countdownTimerNotificationManager.createNotificationChannel()
+    countdownTimerNotificationManager.createNotification(timeLeft)
 
     Column(
         modifier = Modifier.fillMaxSize(),
