@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
-import com.coolnexttech.freetimer.ui.theme.RoundedBox
+import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.util.NotificationService
 import com.coolnexttech.freetimer.util.OnLifecycleEvent
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
@@ -112,7 +112,7 @@ private fun CountDownViewState(workoutData: WorkoutData) {
 
 @Composable
 private fun InfoText(text: String) {
-    RoundedBox {
+    RoundedBox(widthFraction = 0.5f, action = null) {
         Text(
             text = text,
             color = Color.Black,

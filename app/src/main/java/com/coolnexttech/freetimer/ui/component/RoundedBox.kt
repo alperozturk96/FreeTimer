@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.ui.theme
+package com.coolnexttech.freetimer.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,19 +12,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 
 @Composable
-fun RoundedBox(action: () -> Unit = {}, content: @Composable BoxScope.() -> Unit) {
+fun RoundedBox(widthFraction: Float = 1f, action: (() -> Unit)? = {}, content: @Composable BoxScope.() -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(widthFraction)
             .height(100.dp)
             .padding(16.dp)
             .clip(shape = RoundedCornerShape(30.dp))
             .background(TertiaryColor)
-            .clickable { action() }
+            .clickable(enabled = action != null) { action?.invoke() }
     ) {
         content()
     }

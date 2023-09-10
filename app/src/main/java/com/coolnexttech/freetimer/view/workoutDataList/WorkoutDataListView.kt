@@ -35,7 +35,7 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
-import com.coolnexttech.freetimer.ui.theme.RoundedBox
+import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.viewmodel.WorkoutDataListViewModel
 
 @Composable
