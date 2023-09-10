@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
+import com.coolnexttech.freetimer.service.StorageService
 import com.coolnexttech.freetimer.util.MusicPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -27,6 +28,7 @@ class CountDownViewModel : ViewModel() {
     // endregion
 
     // region Dependencies
+    private var storageService: StorageService? = null
     private var musicPlayer: MusicPlayer? = null
     private var _initialWorkoutDuration = 0
     private var _initialRestDuration = 0
@@ -37,6 +39,7 @@ class CountDownViewModel : ViewModel() {
         _initialWorkoutDuration = workoutData.workDuration
         _initialRestDuration = workoutData.restDuration
         musicPlayer = MusicPlayer(context)
+        storageService = StorageService(context)
 
         startCountDown()
     }
@@ -54,6 +57,25 @@ class CountDownViewModel : ViewModel() {
             }
         }
     }
+
+    // region Handle Lifecycle Changes & Update Workout Data
+    fun saveTempWorkoutData() {
+        storageService?.saveTempWorkoutData(_workoutData.value)
+        println("Temp Workout Data Saved")
+    }
+
+    fun updateWorkoutDataWithTempWorkoutData() {
+        val tempWorkoutData = storageService?.readTempWorkoutData() ?: return
+        _workoutData.update {
+            tempWorkoutData
+        }
+        println("Workout Data updated with Temp Workout Data")
+    }
+
+    fun removeTempWorkoutData() {
+        storageService?.removeTempWorkoutData()
+    }
+    // endregion
 
     // region Rest Mode
     private fun handleRestMode() {

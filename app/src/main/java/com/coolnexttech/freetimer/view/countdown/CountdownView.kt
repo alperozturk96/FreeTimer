@@ -1,6 +1,7 @@
 package com.coolnexttech.freetimer.view.countdown
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,20 +23,33 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.WorkoutData
 import com.coolnexttech.freetimer.navigation.Destinations
 import com.coolnexttech.freetimer.util.NotificationService
+import com.coolnexttech.freetimer.util.OnLifecycleEvent
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 
 @Composable
-fun CountDownView(navController: NavHostController, viewModel: CountDownViewModel, initialWorkoutData: WorkoutData) {
+fun CountDownView(
+    navController: NavHostController,
+    viewModel: CountDownViewModel,
+    initialWorkoutData: WorkoutData
+) {
     val context: Context = LocalContext.current
 
     val workoutData by viewModel.workoutData.collectAsState()
     val isRestModeActive by viewModel.isRestModeActive.collectAsState()
     val isTrainingCompleted by viewModel.isCountDownCompleted.collectAsState()
+
+    BackHandler {
+        viewModel.removeTempWorkoutData()
+        navController.popBackStack()
+    }
+
+    ObserveWorkoutData(viewModel)
 
     DisposableEffect(Unit) {
         viewModel.init(initialWorkoutData, context)
@@ -51,9 +65,24 @@ fun CountDownView(navController: NavHostController, viewModel: CountDownViewMode
     CountDownViewState(workoutData, isRestModeActive)
 }
 
+@Composable
+private fun ObserveWorkoutData(viewModel: CountDownViewModel) {
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_PAUSE -> {
+                viewModel.saveTempWorkoutData()
+            }
+            Lifecycle.Event.ON_START -> {
+                viewModel.updateWorkoutDataWithTempWorkoutData()
+            }
+            else -> {}
+        }
+    }
+}
+
 private fun navigateBackToHome(navController: NavHostController) {
     navController.navigate(Destinations.Home) {
-        popUpTo(Destinations.Home){
+        popUpTo(Destinations.Home) {
             inclusive = true
         }
     }
