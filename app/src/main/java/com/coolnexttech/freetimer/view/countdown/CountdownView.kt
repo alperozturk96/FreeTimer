@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
-import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
+import com.coolnexttech.freetimer.manager.CountdownNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.ui.theme.PrimaryColor
@@ -39,7 +39,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun CountDownView(navController: NavHostController, viewModel: CountdownViewModel) {
     val context: Context = LocalContext.current
 
-    val notificationManager = CountdownTimerNotificationManager(context)
+    val notificationManager = CountdownNotificationManager(context)
     val countdownData by viewModel.countdownData.collectAsState()
     val timeLeft = if (countdownData.isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
@@ -91,8 +91,13 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
         }
     }
 
+    val notificationIconId = if (dimScreen) {
+        R.drawable.im_black
+    } else {
+        R.drawable.im_timer
+    }
     notificationManager.createNotificationChannel()
-    notificationManager.createNotification(timeLeft)
+    notificationManager.createNotification(timeLeft, notificationIconId)
 }
 
 @Composable
@@ -166,7 +171,7 @@ private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () 
 
 private fun finishCountdown(
     navController: NavHostController,
-    notificationManager: CountdownTimerNotificationManager
+    notificationManager: CountdownNotificationManager
 ) {
     notificationManager.deleteNotificationChannel()
     navController.popBackStack()

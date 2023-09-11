@@ -4,9 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import com.coolnexttech.freetimer.R
 
-class CountdownTimerNotificationManager(private val context: Context) {
+class CountdownNotificationManager(private val context: Context) {
     private val channelId = "CountdownTimerServiceChannelId"
     private val notificationName = "CountdownTimerServiceNotificationName"
     private val notificationId = 1
@@ -15,12 +14,12 @@ class CountdownTimerNotificationManager(private val context: Context) {
     private val importance = NotificationManager.IMPORTANCE_DEFAULT
     private val channel = NotificationChannel(channelId, notificationName, importance)
 
-    fun createNotification(timeLeft: String) {
+    fun createNotification(timeLeft: String, iconId: Int) {
         val notification = NotificationCompat.Builder(context, channelId)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setStyle(NotificationCompat.BigTextStyle().bigText(timeLeft))
             .setSilent(true)
-            .setSmallIcon(R.drawable.im_timer)
+            .setSmallIcon(iconId)
             .build()
 
         nm.notify(notificationId, notification)
