@@ -25,14 +25,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
-import com.coolnexttech.freetimer.model.toJson
 import com.coolnexttech.freetimer.service.MusicPlayerService
-import com.coolnexttech.freetimer.ui.component.LifecycleEventListener
 import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
@@ -44,18 +41,18 @@ fun CountDownView(
     val context: Context = LocalContext.current
     val notificationManager = CountdownTimerNotificationManager(context)
     val serviceIntent = Intent(context, MusicPlayerService::class.java)
-    val countdownData by viewModel.countdownData.collectAsState()
+    val countdownData by CountDownViewModel.countdownData.collectAsState()
     var showCancelCountdownAlert by remember { mutableStateOf(false) }
     val isCountDownCompleted by viewModel.isCountDownCompleted.collectAsState()
 
+    // FIXME Service still working
     BackHandler {
         showCancelCountdownAlert = true
     }
 
-    ObserveCountdownData(context, serviceIntent, countdownData, viewModel)
-
     DisposableEffect(Unit) {
-        viewModel.init(initialCountdownData, context)
+        viewModel.setupCountdownData(initialCountdownData)
+        startMusicPlayerService(context, serviceIntent)
         onDispose {
 
         }
@@ -108,36 +105,10 @@ private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () 
     )
 }
 
-@Composable
-private fun ObserveCountdownData(
-    context: Context,
-    serviceIntent: Intent,
-    countdownData: CountdownData,
-    viewModel: CountDownViewModel
-) {
-    LifecycleEventListener { _, event ->
-        when (event) {
-            Lifecycle.Event.ON_PAUSE -> {
-                viewModel.saveTempCountdownData()
-                startMusicPlayerService(context, serviceIntent, countdownData)
-                viewModel.disableMediaPlayer()
-            }
-
-            Lifecycle.Event.ON_START -> {
-                stopMusicPlayerService(context, serviceIntent)
-                viewModel.updateCountdownDataWithTempCountdownData()
-            }
-
-            else -> {}
-        }
-    }
-}
-
 private fun startMusicPlayerService(
-    context: Context, serviceIntent: Intent, countdownData: CountdownData
+    context: Context, serviceIntent: Intent
 ) {
     serviceIntent.action = MusicPlayerService.Actions.Start.toString()
-    serviceIntent.putExtra(MusicPlayerService.serviceCountdownData, countdownData.toJson())
     context.startService(serviceIntent)
 }
 

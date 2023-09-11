@@ -9,28 +9,24 @@ import android.content.Intent
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
-import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
-import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.model.startCountDown
-import com.coolnexttech.freetimer.model.toCountdownData
+import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.countdownData
+import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initialRestDuration
+import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initialWorkoutDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MusicPlayerService : Service() {
     private var mediaPlayerManager = MediaPlayerManager(this)
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var wakeLock: PowerManager.WakeLock? = null
-    private lateinit var countdownData: CountdownData
-
-    private var _initialWorkoutDuration = 0
-    private var _initialRestDuration = 0
 
     companion object {
-        const val serviceCountdownData = "countdown_data"
         var canStartService = true
     }
 
@@ -46,13 +42,7 @@ class MusicPlayerService : Service() {
 
         println("MusicPlayerService Started")
 
-        val json = intent?.getStringExtra(serviceCountdownData)
-        countdownData = json?.toCountdownData() ?: return START_STICKY
-
-        _initialWorkoutDuration = countdownData.workDuration
-        _initialRestDuration = countdownData.restDuration
-
-        when (intent.action) {
+        when (intent?.action) {
             Actions.Start.toString() -> startService()
             Actions.Stop.toString() -> stopSelf()
         }
@@ -81,9 +71,11 @@ class MusicPlayerService : Service() {
         setWakeLock()
 
         scope.launch {
-            while (!countdownData.isWorkoutFinished()) {
+            while (!countdownData.value.isWorkoutFinished()) {
                 println("MusicPlayerService Running")
-                countdownData = countdownData.startCountDown(mediaPlayerManager, _initialWorkoutDuration, _initialRestDuration)
+                countdownData.update {
+                    it.startCountDown(mediaPlayerManager, initialWorkoutDuration, initialRestDuration)
+                }
                 delay(1000)
             }
         }
