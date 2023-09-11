@@ -28,12 +28,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
+import com.coolnexttech.freetimer.extension.findActivity
+import com.coolnexttech.freetimer.extension.hideNavBar
+import com.coolnexttech.freetimer.extension.hideSystemBar
 import com.coolnexttech.freetimer.manager.CountdownNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.ui.component.RoundedBox
-import com.coolnexttech.freetimer.ui.theme.PrimaryColor
 import com.coolnexttech.freetimer.viewmodel.CountdownViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+
 
 @Composable
 fun CountDownView(navController: NavHostController, viewModel: CountdownViewModel) {
@@ -73,23 +76,15 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     if (dimScreen) {
         BlackScreen {
             dimScreen = false
-
-            systemUiController.setSystemBarsColor(
-                darkIcons = false,
-                color = PrimaryColor
-            )
         }
     } else {
         CountDownViewState(timeLeft, countdownData) {
             dimScreen = true
-
-            systemUiController.setSystemBarsColor(
-                isNavigationBarContrastEnforced = false,
-                darkIcons = true,
-                color = Color.Black
-            )
         }
     }
+
+    systemUiController.hideSystemBar(dimScreen)
+    context.findActivity().hideNavBar(dimScreen)
 
     val notificationIconId = if (dimScreen) {
         R.drawable.im_black

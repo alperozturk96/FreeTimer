@@ -16,6 +16,7 @@ import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.ui.navigation.Navigation
 import com.coolnexttech.freetimer.ui.theme.FreeTimerTheme
 
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

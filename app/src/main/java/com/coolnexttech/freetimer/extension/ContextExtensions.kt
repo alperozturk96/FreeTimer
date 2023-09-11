@@ -1,11 +1,14 @@
 package com.coolnexttech.freetimer.extension
 
+import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import androidx.appcompat.app.AppCompatActivity
 
-fun Context.getActivity(): AppCompatActivity? = when (this) {
-    is AppCompatActivity -> this
-    is ContextWrapper -> baseContext.getActivity()
-    else -> null
+internal fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("Permissions should be called in the context of an Activity")
 }
