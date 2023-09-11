@@ -3,12 +3,16 @@ package com.coolnexttech.freetimer.view.countdown
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,7 +35,9 @@ import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.service.MusicPlayerService
 import com.coolnexttech.freetimer.ui.component.RoundedBox
+import com.coolnexttech.freetimer.ui.theme.PrimaryColor
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun CountDownView(
@@ -44,6 +50,9 @@ fun CountDownView(
     val serviceIntent = Intent(context, MusicPlayerService::class.java)
     val countdownData by CountDownViewModel.countdownData.collectAsState()
     var showCancelCountdownAlert by remember { mutableStateOf(false) }
+
+    var dimScreen by remember { mutableStateOf(false) }
+    val systemUiController = rememberSystemUiController()
 
     BackHandler {
         showCancelCountdownAlert = true
@@ -65,20 +74,81 @@ fun CountDownView(
         })
     }
 
-    CountDownViewState(countdownData, notificationManager)
+    if (dimScreen) {
+        BlackScreen {
+            dimScreen = false
+            systemUiController.setSystemBarsColor(
+                darkIcons = false,
+                color = PrimaryColor
+            )
+        }
+    } else {
+        CountDownViewState(countdownData, notificationManager) {
+            dimScreen = it
+            systemUiController.setSystemBarsColor(
+                isNavigationBarContrastEnforced = false,
+                darkIcons = true,
+                color = Color.Black
+            )
+        }
+    }
 }
 
-private fun finishCountdown(
-    navController: NavHostController,
-    context: Context,
-    serviceIntent: Intent,
+
+@Composable
+private fun CountDownViewState(
+    countdownData: CountdownData,
     notificationManager: CountdownTimerNotificationManager,
-    viewModel: CountDownViewModel
+    lockScreen: (Boolean) -> Unit
 ) {
-    notificationManager.deleteNotificationChannel()
-    stopMusicPlayerService(context, serviceIntent)
-    viewModel.reset()
-    navController.popBackStack()
+    val timeLeft = if (countdownData.isRestModeActive) {
+        stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
+    } else {
+        stringResource(id = R.string.count_down_screen_work_duration_info_text) + countdownData.workDuration
+    }
+
+    notificationManager.createNotificationChannel()
+    notificationManager.createNotification(timeLeft)
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+        InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
+        InfoText(text = timeLeft)
+        Text(text = stringResource(id = R.string.count_down_screen_switch_text))
+        Switch(
+            checked = false,
+            onCheckedChange = {
+                lockScreen(it)
+            }
+        )
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun InfoText(text: String) {
+    RoundedBox(widthFraction = 0.5f, action = null) {
+        Text(
+            text = text,
+            color = Color.Black,
+            fontFamily = MaterialTheme.typography.displayLarge.fontFamily,
+            fontSize = 20.sp,
+        )
+    }
+}
+
+@Composable
+private fun BlackScreen(unlockScreen: () -> Unit) {
+    Box(modifier = Modifier
+        .background(Color.Black)
+        .fillMaxSize()
+        .clickable {
+            unlockScreen()
+        }) {}
 }
 
 @Composable
@@ -104,6 +174,19 @@ private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () 
     })
 }
 
+private fun finishCountdown(
+    navController: NavHostController,
+    context: Context,
+    serviceIntent: Intent,
+    notificationManager: CountdownTimerNotificationManager,
+    viewModel: CountDownViewModel
+) {
+    notificationManager.deleteNotificationChannel()
+    stopMusicPlayerService(context, serviceIntent)
+    viewModel.reset()
+    navController.popBackStack()
+}
+
 private fun startMusicPlayerService(
     context: Context, serviceIntent: Intent
 ) {
@@ -114,42 +197,4 @@ private fun startMusicPlayerService(
 private fun stopMusicPlayerService(context: Context, serviceIntent: Intent) {
     serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
     context.startService(serviceIntent)
-}
-
-@Composable
-private fun CountDownViewState(
-    countdownData: CountdownData, notificationManager: CountdownTimerNotificationManager
-) {
-
-    val timeLeft = if (countdownData.isRestModeActive) {
-        stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
-    } else {
-        stringResource(id = R.string.count_down_screen_work_duration_info_text) + countdownData.workDuration
-    }
-
-    notificationManager.createNotificationChannel()
-    notificationManager.createNotification(timeLeft)
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
-        InfoText(text = timeLeft)
-        Spacer(modifier = Modifier.weight(1f))
-    }
-}
-
-@Composable
-private fun InfoText(text: String) {
-    RoundedBox(widthFraction = 0.5f, action = null) {
-        Text(
-            text = text,
-            color = Color.Black,
-            fontFamily = MaterialTheme.typography.displayLarge.fontFamily,
-            fontSize = 20.sp,
-        )
-    }
 }
