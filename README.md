@@ -18,8 +18,18 @@ Clean and feature-rich timer with no ads, no tracking, and zero 3rd party depend
 
 ## Pics
 
+Note: Screenshots taken from emulator
+
 <img width="478" alt="home" src="https://github.com/alperozturk96/FreeTimer/assets/67455295/6eb3704c-2739-491f-94aa-75aafe4bd1a8">
 
-<img width="478" alt="list" src="https://github.com/alperozturk96/FreeTimer/assets/67455295/47ceec4a-ab35-4a09-998d-8753470a0305">
+<img width="451" alt="dell" src="https://github.com/alperozturk96/FreeTimer/assets/67455295/5e1f2ab0-ec4b-4039-8a32-6dcd03a71daa">
 
-<img width="478" alt="countdown" src="https://github.com/alperozturk96/FreeTimer/assets/67455295/04e33103-f179-4431-9c3f-4e3046df85a7">
+
+<img width="456" alt="Screenshot 2023-09-11 at 19 19 31" src="https://github.com/alperozturk96/FreeTimer/assets/67455295/fa9d95b2-d97c-494d-951c-1b62dbadb28a">
+
+### Dim Feature
+
+It darkens the entire screen to conserve battery power, allowing you to focus on your training without the need for any background services.
+
+<img width="451" alt="Screenshot 2023-09-11 at 19 19 45" src="https://github.com/alperozturk96/FreeTimer/assets/67455295/b6b6b99d-8ede-42ef-bac4-068a8e10c74d">
+
