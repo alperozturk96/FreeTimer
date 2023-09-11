@@ -45,14 +45,14 @@ fun CountDownView(
     val notificationManager = CountdownTimerNotificationManager(context)
     val serviceIntent = Intent(context, MusicPlayerService::class.java)
     val countdownData by viewModel.countdownData.collectAsState()
-    var showCancelWorkoutAlert by remember { mutableStateOf(false) }
+    var showCancelCountdownAlert by remember { mutableStateOf(false) }
     val isCountDownCompleted by viewModel.isCountDownCompleted.collectAsState()
 
     BackHandler {
-        showCancelWorkoutAlert = true
+        showCancelCountdownAlert = true
     }
 
-    ObserveWorkoutData(context, serviceIntent, countdownData, viewModel)
+    ObserveCountdownData(context, serviceIntent, countdownData, viewModel)
 
     DisposableEffect(Unit) {
         viewModel.init(initialCountdownData, context)
@@ -65,7 +65,7 @@ fun CountDownView(
         navigateBackToHome(navController)
     }
 
-    if (showCancelWorkoutAlert) {
+    if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
             MusicPlayerService.canStartService = false
             viewModel.finishCountDown()
@@ -73,7 +73,7 @@ fun CountDownView(
             stopMusicPlayerService(context, serviceIntent)
             navController.popBackStack()
         }, dismiss = {
-            showCancelWorkoutAlert = false
+            showCancelCountdownAlert = false
         })
     }
 
@@ -109,7 +109,7 @@ private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () 
 }
 
 @Composable
-private fun ObserveWorkoutData(
+private fun ObserveCountdownData(
     context: Context,
     serviceIntent: Intent,
     countdownData: CountdownData,
@@ -118,14 +118,14 @@ private fun ObserveWorkoutData(
     LifecycleEventListener { _, event ->
         when (event) {
             Lifecycle.Event.ON_PAUSE -> {
-                viewModel.saveTempWorkoutData()
+                viewModel.saveTempCountdownData()
                 startMusicPlayerService(context, serviceIntent, countdownData)
                 viewModel.disableMediaPlayer()
             }
 
             Lifecycle.Event.ON_START -> {
                 stopMusicPlayerService(context, serviceIntent)
-                viewModel.updateWorkoutDataWithTempWorkoutData()
+                viewModel.updateCountdownDataWithTempCountdownData()
             }
 
             else -> {}

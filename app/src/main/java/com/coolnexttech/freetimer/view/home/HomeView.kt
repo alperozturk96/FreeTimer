@@ -53,7 +53,7 @@ import com.coolnexttech.freetimer.viewmodel.HomeViewModel
 @Composable
 fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
     val countdownData: CountdownData by viewModel.countdownData.collectAsState()
-    val showSaveWorkoutAlert by viewModel.showSaveWorkoutAlert.collectAsState()
+    val showSaveCountdownAlert by viewModel.showSaveCountdownAlert.collectAsState()
 
     var setCountText by remember {
         mutableStateOf("")
@@ -82,11 +82,11 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
                     }) {
                         Icon(
                             Icons.Default.List,
-                            contentDescription = "Navigate To Workout Data List"
+                            contentDescription = "Navigate To Countdown Data List"
                         )
                     }
                     IconButton(onClick = {
-                        viewModel.showSaveWorkoutAlert()
+                        viewModel.showSaveCountdownAlert()
                     }) {
                         Icon(
                             Icons.Default.AddCircle,
@@ -133,19 +133,19 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        if (showSaveWorkoutAlert) {
-            SaveWorkoutAlertDialog(context, viewModel, saveWorkoutData = {
+        if (showSaveCountdownAlert) {
+            SaveCountdownAlertDialog(context, viewModel, saveCountdownData = {
                 setCountText = ""
                 workoutDurationText = ""
                 restDurationText = ""
-                viewModel.saveWorkout()
+                viewModel.saveCountdownData()
             })
         }
     }
 }
 
 @Composable
-private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel, saveWorkoutData: () -> Unit) {
+private fun SaveCountdownAlertDialog(context: Context, viewModel: HomeViewModel, saveCountdownData: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var warningMessage: String? = null
 
@@ -169,7 +169,7 @@ private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel, s
                 value = name,
                 onValueChange = {
                     name = it
-                    viewModel.updateWorkoutDataName(it)
+                    viewModel.updateCountdownDataName(it)
                 },
                 singleLine = true
             )
@@ -186,14 +186,14 @@ private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel, s
                 if (warningMessage != null) {
                     Toast.makeText(context, warningMessage, Toast.LENGTH_SHORT).show()
                 } else {
-                    saveWorkoutData()
+                    saveCountdownData()
                 }
             }) {
                 Text(stringResource(id = R.string.home_screen_save_workout_alert_confirm_button_text), color = Color.Black)
             }
         },
         dismissButton = {
-            TextButton(onClick = { viewModel.hideSaveWorkoutAlert() }) {
+            TextButton(onClick = { viewModel.hideSaveCountdownAlert() }) {
                 Text(stringResource(id = R.string.home_screen_save_workout_alert_dismiss_button_text), color = Color.Black)
             }
         }

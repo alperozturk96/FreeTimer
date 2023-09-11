@@ -47,14 +47,14 @@ class CountDownViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.Main) {
             while (!_isCountdownCompleted.value) {
                 _countdownData.value.print()
-                handleWorkoutData()
+                handleCountdownData()
                 delay(1000)
             }
         }
     }
 
     // TODO Use Single Source of Truth
-    private fun handleWorkoutData() {
+    private fun handleCountdownData() {
         if (_countdownData.value.isRestModeActive) {
             handleRestMode()
         } else {
@@ -76,37 +76,37 @@ class CountDownViewModel : ViewModel() {
             true
         }
         releaseMediaPlayer()
-        removeTempWorkoutData()
+        clearTempData()
     }
 
     // region Handle Lifecycle Changes & Update Workout Data
-    fun saveTempWorkoutData() {
-        storageManager?.saveTempWorkoutData(_countdownData.value)
+    fun saveTempCountdownData() {
+        storageManager?.saveTempCountdownData(_countdownData.value)
         storageManager?.saveWhenAppInBackground(System.currentTimeMillis())
-        println("Temp Workout Data Saved")
+        println("Temp Countdown Data Saved")
     }
 
-    fun updateWorkoutDataWithTempWorkoutData() {
-        val tempWorkoutData = storageManager?.readTempCountdownData() ?: return
+    fun updateCountdownDataWithTempCountdownData() {
+        val tempCountdownData = storageManager?.readTempCountdownData() ?: return
         val whenAppInForeground = storageManager?.readWhenAppInForeground() ?: return
         val timeDiffInMilliSecond = System.currentTimeMillis() - whenAppInForeground
         val timeDiffInSecond = (timeDiffInMilliSecond / 1000L).toInt()
 
         println("Time Difference In Second: $timeDiffInSecond")
         _countdownData.update {
-            tempWorkoutData
+            tempCountdownData
         }
 
         repeat(timeDiffInSecond) {
-            handleWorkoutData()
+            handleCountdownData()
         }
 
         mediaPlayerManager?.canPlay = true
-        println("Workout Data updated with Temp Workout Data")
+        println("Countdown Data updated with Temp Countdown Data")
     }
 
-    private fun removeTempWorkoutData() {
-        storageManager?.removeTempData()
+    private fun clearTempData() {
+        storageManager?.clear()
     }
     // endregion
 

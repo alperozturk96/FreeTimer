@@ -19,11 +19,11 @@ data class CountdownData(
 ) {
     fun print() {
         println("------------------------------------")
-        println("Workout Name: $name")
-        println("Workout RestMode : $isRestModeActive")
-        println("Workout Set: $setCount")
-        println("Workout WorkDuration: $workDuration")
-        println("Workout RestDuration: $restDuration")
+        println("Countdown Name: $name")
+        println("Countdown RestMode : $isRestModeActive")
+        println("Countdown Set: $setCount")
+        println("Countdown WorkDuration: $workDuration")
+        println("Countdown RestDuration: $restDuration")
     }
 
     // TODO FIX
@@ -73,6 +73,6 @@ fun CountdownData.toJson(): String {
     return Gson().toJson(this)
 }
 
-fun String.toWorkoutData(): CountdownData {
+fun String.toCountdownData(): CountdownData {
     return Gson().fromJson(this, CountdownData::class.java)
 }

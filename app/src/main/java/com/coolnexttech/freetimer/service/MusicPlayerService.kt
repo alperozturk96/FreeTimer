@@ -12,7 +12,7 @@ import android.os.SystemClock
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.coolnexttech.freetimer.model.CountdownData
-import com.coolnexttech.freetimer.model.toWorkoutData
+import com.coolnexttech.freetimer.model.toCountdownData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,7 +46,7 @@ class MusicPlayerService : Service() {
         println("MusicPlayerService Started")
 
         val json = intent?.getStringExtra(serviceCountdownData)
-        countdownData = json?.toWorkoutData() ?: return START_STICKY
+        countdownData = json?.toCountdownData() ?: return START_STICKY
 
         _initialWorkoutDuration = countdownData.workDuration
         _initialRestDuration = countdownData.restDuration

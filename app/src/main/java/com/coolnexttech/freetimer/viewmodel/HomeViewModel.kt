@@ -15,8 +15,8 @@ class HomeViewModel: ViewModel() {
     private val _countdownData = MutableStateFlow(CountdownData())
     val countdownData: StateFlow<CountdownData> = _countdownData
 
-    private val _showSaveWorkoutAlert = MutableStateFlow(false)
-    val showSaveWorkoutAlert: StateFlow<Boolean> = _showSaveWorkoutAlert
+    private val _showSaveCountdownAlert = MutableStateFlow(false)
+    val showSaveCountdownAlert: StateFlow<Boolean> = _showSaveCountdownAlert
 
     private var countdownDataStorage: CountdownDataStorage? = null
 
@@ -24,25 +24,25 @@ class HomeViewModel: ViewModel() {
         countdownDataStorage = CountdownDataStorage.getInstance(context)
     }
 
-    fun showSaveWorkoutAlert() {
-        _showSaveWorkoutAlert.update {
+    fun showSaveCountdownAlert() {
+        _showSaveCountdownAlert.update {
             true
         }
     }
 
-    fun updateWorkoutDataName(name: String) {
+    fun updateCountdownDataName(name: String) {
         _countdownData.update {
             it.copy(name = name)
         }
     }
 
-    fun hideSaveWorkoutAlert() {
-        _showSaveWorkoutAlert.update {
+    fun hideSaveCountdownAlert() {
+        _showSaveCountdownAlert.update {
             false
         }
     }
 
-    fun saveWorkout() {
+    fun saveCountdownData() {
         viewModelScope.launch(Dispatchers.IO) {
             countdownDataStorage?.add(_countdownData.value)
 
@@ -50,7 +50,7 @@ class HomeViewModel: ViewModel() {
                 _countdownData.update {
                     CountdownData()
                 }
-                hideSaveWorkoutAlert()
+                hideSaveCountdownAlert()
             }
         }
     }
