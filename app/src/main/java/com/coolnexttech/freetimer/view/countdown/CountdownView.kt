@@ -41,16 +41,14 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
 
     val notificationManager = CountdownTimerNotificationManager(context)
     val countdownData by viewModel.countdownData.collectAsState()
-    var showCancelCountdownAlert by remember { mutableStateOf(false) }
-
-    var dimScreen by remember { mutableStateOf(false) }
-    val systemUiController = rememberSystemUiController()
-
     val timeLeft = if (countdownData.isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
     } else {
         stringResource(id = R.string.count_down_screen_work_duration_info_text) + countdownData.workDuration
     }
+    var showCancelCountdownAlert by remember { mutableStateOf(false) }
+    var dimScreen by remember { mutableStateOf(false) }
+    val systemUiController = rememberSystemUiController()
 
     BackHandler {
         showCancelCountdownAlert = true
@@ -96,7 +94,6 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     notificationManager.createNotificationChannel()
     notificationManager.createNotification(timeLeft)
 }
-
 
 @Composable
 private fun CountDownViewState(
