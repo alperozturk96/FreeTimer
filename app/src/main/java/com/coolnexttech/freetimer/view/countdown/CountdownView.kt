@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,32 +26,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
+import com.coolnexttech.freetimer.model.countdownData
+import com.coolnexttech.freetimer.model.resetCountDownData
 import com.coolnexttech.freetimer.service.MusicPlayerService
 import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.ui.theme.PrimaryColor
-import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun CountDownView(
-    navController: NavHostController,
-    viewModel: CountDownViewModel
-) {
+    navController: NavHostController) {
     val context: Context = LocalContext.current
 
     val notificationManager = CountdownTimerNotificationManager(context)
     val serviceIntent = Intent(context, MusicPlayerService::class.java)
-    val countdownData by CountDownViewModel.countdownData.collectAsState()
+    val countdownData by countdownData.collectAsState()
     var showCancelCountdownAlert by remember { mutableStateOf(false) }
 
     var dimScreen by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
+
+    val timeLeft = if (countdownData.isRestModeActive) {
+        stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
+    } else {
+        stringResource(id = R.string.count_down_screen_work_duration_info_text) + countdownData.workDuration
+    }
 
     BackHandler {
         showCancelCountdownAlert = true
@@ -63,12 +66,12 @@ fun CountDownView(
     }
 
     if (countdownData.isWorkoutFinished()) {
-        finishCountdown(navController, context, serviceIntent, notificationManager, viewModel)
+        finishCountdown(navController, context, serviceIntent, notificationManager)
     }
 
     if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
-            finishCountdown(navController, context, serviceIntent, notificationManager, viewModel)
+            finishCountdown(navController, context, serviceIntent, notificationManager)
         }, dismiss = {
             showCancelCountdownAlert = false
         })
@@ -77,14 +80,16 @@ fun CountDownView(
     if (dimScreen) {
         BlackScreen {
             dimScreen = false
+
             systemUiController.setSystemBarsColor(
                 darkIcons = false,
                 color = PrimaryColor
             )
         }
     } else {
-        CountDownViewState(countdownData, notificationManager) {
-            dimScreen = it
+        CountDownViewState(timeLeft, countdownData) {
+            dimScreen = true
+
             systemUiController.setSystemBarsColor(
                 isNavigationBarContrastEnforced = false,
                 darkIcons = true,
@@ -92,28 +97,21 @@ fun CountDownView(
             )
         }
     }
+
+    notificationManager.createNotificationChannel()
+    notificationManager.createNotification(timeLeft)
 }
 
 
 @Composable
 private fun CountDownViewState(
+    timeLeft: String,
     countdownData: CountdownData,
-    notificationManager: CountdownTimerNotificationManager,
-    lockScreen: (Boolean) -> Unit
+    lockScreen: () -> Unit
 ) {
-    val timeLeft = if (countdownData.isRestModeActive) {
-        stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
-    } else {
-        stringResource(id = R.string.count_down_screen_work_duration_info_text) + countdownData.workDuration
-    }
-
-    notificationManager.createNotificationChannel()
-    notificationManager.createNotification(timeLeft)
-
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))
         InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
@@ -122,7 +120,7 @@ private fun CountDownViewState(
         Switch(
             checked = false,
             onCheckedChange = {
-                lockScreen(it)
+                lockScreen()
             }
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -178,12 +176,11 @@ private fun finishCountdown(
     navController: NavHostController,
     context: Context,
     serviceIntent: Intent,
-    notificationManager: CountdownTimerNotificationManager,
-    viewModel: CountDownViewModel
+    notificationManager: CountdownTimerNotificationManager
 ) {
     notificationManager.deleteNotificationChannel()
     stopMusicPlayerService(context, serviceIntent)
-    viewModel.reset()
+    resetCountDownData()
     navController.popBackStack()
 }
 

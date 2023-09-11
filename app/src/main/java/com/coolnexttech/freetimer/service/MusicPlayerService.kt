@@ -10,10 +10,10 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
+import com.coolnexttech.freetimer.model.countdownData
+import com.coolnexttech.freetimer.model.initialRestDuration
+import com.coolnexttech.freetimer.model.initialWorkoutDuration
 import com.coolnexttech.freetimer.model.startCountDown
-import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.countdownData
-import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initialRestDuration
-import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initialWorkoutDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,6 +79,8 @@ class MusicPlayerService : Service() {
                 }
                 delay(1000)
             }
+
+            println("Job is done")
         }
     }
 
