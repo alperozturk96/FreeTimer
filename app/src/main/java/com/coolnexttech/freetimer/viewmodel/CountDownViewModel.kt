@@ -12,15 +12,21 @@ class CountDownViewModel : ViewModel() {
         var countdownData = MutableStateFlow(CountdownData())
         var initialWorkoutDuration = 0
         var initialRestDuration = 0
+
+        fun setupCountdownData(data: CountdownData) {
+            initialWorkoutDuration = data.workDuration
+            initialRestDuration = data.restDuration
+
+            countdownData.update {
+                data
+            }
+        }
     }
     // endregion
 
-    fun setupCountdownData(data: CountdownData) {
-        initialWorkoutDuration = data.workDuration
-        initialRestDuration = data.restDuration
-
-        countdownData.update {
-            data
-        }
+    fun reset() {
+        countdownData = MutableStateFlow(CountdownData())
+        initialWorkoutDuration = 0
+        initialRestDuration = 0
     }
 }

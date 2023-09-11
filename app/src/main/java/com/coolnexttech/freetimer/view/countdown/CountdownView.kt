@@ -12,7 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,10 +36,10 @@ import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 @Composable
 fun CountDownView(
     navController: NavHostController,
-    viewModel: CountDownViewModel,
-    initialCountdownData: CountdownData
+    viewModel: CountDownViewModel
 ) {
     val context: Context = LocalContext.current
+
     val notificationManager = CountdownTimerNotificationManager(context)
     val serviceIntent = Intent(context, MusicPlayerService::class.java)
     val countdownData by CountDownViewModel.countdownData.collectAsState()
@@ -49,21 +49,17 @@ fun CountDownView(
         showCancelCountdownAlert = true
     }
 
-    DisposableEffect(Unit) {
-        viewModel.setupCountdownData(initialCountdownData)
+    LaunchedEffect(true) {
         startMusicPlayerService(context, serviceIntent)
-        onDispose {
-
-        }
     }
 
     if (countdownData.isWorkoutFinished()) {
-        finishCountdown(navController, context, serviceIntent, notificationManager)
+        finishCountdown(navController, context, serviceIntent, notificationManager, viewModel)
     }
 
     if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
-            finishCountdown(navController, context, serviceIntent, notificationManager)
+            finishCountdown(navController, context, serviceIntent, notificationManager, viewModel)
         }, dismiss = {
             showCancelCountdownAlert = false
         })
@@ -76,39 +72,36 @@ private fun finishCountdown(
     navController: NavHostController,
     context: Context,
     serviceIntent: Intent,
-    notificationManager: CountdownTimerNotificationManager
+    notificationManager: CountdownTimerNotificationManager,
+    viewModel: CountDownViewModel
 ) {
     notificationManager.deleteNotificationChannel()
     stopMusicPlayerService(context, serviceIntent)
+    viewModel.reset()
     navController.popBackStack()
 }
 
 @Composable
 private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { },
-        title = {
-            Text(text = stringResource(id = R.string.count_down_screen_cancel_countdown_alert_title))
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                cancelCountdown()
-            }) {
-                Text(
-                    stringResource(id = R.string.count_down_screen_cancel_countdown_confirm_button),
-                    color = Color.Black
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { dismiss() }) {
-                Text(
-                    stringResource(id = R.string.count_down_screen_cancel_countdown_dismiss_button),
-                    color = Color.Black
-                )
-            }
+    AlertDialog(onDismissRequest = { }, title = {
+        Text(text = stringResource(id = R.string.count_down_screen_cancel_countdown_alert_title))
+    }, confirmButton = {
+        TextButton(onClick = {
+            cancelCountdown()
+        }) {
+            Text(
+                stringResource(id = R.string.count_down_screen_cancel_countdown_confirm_button),
+                color = Color.Black
+            )
         }
-    )
+    }, dismissButton = {
+        TextButton(onClick = { dismiss() }) {
+            Text(
+                stringResource(id = R.string.count_down_screen_cancel_countdown_dismiss_button),
+                color = Color.Black
+            )
+        }
+    })
 }
 
 private fun startMusicPlayerService(

@@ -35,8 +35,10 @@ fun Navigation(navController: NavHostController, startDestination: String) {
         ) {
             val json = it.arguments?.getString("countdownData")
             val countdownData = json?.toCountdownData() ?: CountdownData()
+            CountDownViewModel.setupCountdownData(countdownData)
             val viewModel: CountDownViewModel = viewModel()
-            CountDownView(navController, viewModel, countdownData)
+
+            CountDownView(navController, viewModel)
         }
     }
 }

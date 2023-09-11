@@ -20,7 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,9 +52,8 @@ fun CountdownDataListView(navController: NavHostController, viewModel: Countdown
 
     val context = LocalContext.current
 
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         viewModel.initDb(context)
-        onDispose { }
     }
 
     if (countdownDataList.isEmpty()) {
@@ -106,6 +105,25 @@ fun CountdownDataListView(navController: NavHostController, viewModel: Countdown
 }
 
 @Composable
+private fun CountdownDataListItemView(
+    countdownData: CountdownData,
+    context: Context,
+    navController: NavHostController
+) {
+    RoundedBox(action = {
+        Destinations.navigateToCountDownView(countdownData, context, navController)
+    }) {
+        Text(
+            text = countdownData.name,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .height(100.dp)
+                .wrapContentHeight()
+        )
+    }
+}
+
+@Composable
 private fun NoCountdownDataText() {
     Box(contentAlignment = Alignment.Center) {
         Text(
@@ -147,23 +165,4 @@ private fun DeleteCountdownDataAlertDialog(
             }
         }
     )
-}
-
-@Composable
-private fun CountdownDataListItemView(
-    countdownData: CountdownData,
-    context: Context,
-    navController: NavHostController
-) {
-    RoundedBox(action = {
-        Destinations.navigateToCountDownView(countdownData, context, navController)
-    }) {
-        Text(
-            text = countdownData.name,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .height(100.dp)
-                .wrapContentHeight()
-        )
-    }
 }

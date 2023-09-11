@@ -8,8 +8,8 @@ import com.coolnexttech.freetimer.model.toJson
 
 object Destinations {
     const val Home = "Home"
-    const val CountDown = "CountDown"
     const val CountdownDataList = "CountdownDataList"
+    const val CountDown = "CountDown"
 
     fun navigateToCountDownView(
         countdownData: CountdownData,
