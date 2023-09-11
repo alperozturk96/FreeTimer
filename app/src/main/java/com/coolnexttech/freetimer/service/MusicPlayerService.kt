@@ -10,9 +10,9 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import com.coolnexttech.freetimer.R
-import com.coolnexttech.freetimer.model.WorkoutData
-import com.coolnexttech.freetimer.model.toWorkoutData
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
+import com.coolnexttech.freetimer.model.CountdownData
+import com.coolnexttech.freetimer.model.toWorkoutData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,13 +23,14 @@ class MusicPlayerService : Service() {
     private var mediaPlayerManager = MediaPlayerManager(this)
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var wakeLock: PowerManager.WakeLock? = null
-    private lateinit var workoutData: WorkoutData
+    private lateinit var countdownData: CountdownData
 
     private var _initialWorkoutDuration = 0
     private var _initialRestDuration = 0
 
     companion object {
-        const val serviceWorkoutData = "workout_data"
+        const val serviceCountdownData = "countdown_data"
+        var canStartService = true
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -37,12 +38,18 @@ class MusicPlayerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (!canStartService) {
+            stopSelf()
+            return START_STICKY
+        }
+
         println("MusicPlayerService Started")
 
-        val json = intent?.getStringExtra(serviceWorkoutData)
-        workoutData = json?.toWorkoutData() ?: return START_STICKY
-        _initialWorkoutDuration = workoutData.workDuration
-        _initialRestDuration = workoutData.restDuration
+        val json = intent?.getStringExtra(serviceCountdownData)
+        countdownData = json?.toWorkoutData() ?: return START_STICKY
+
+        _initialWorkoutDuration = countdownData.workDuration
+        _initialRestDuration = countdownData.restDuration
 
         when (intent.action) {
             Actions.Start.toString() -> startService()
@@ -73,31 +80,31 @@ class MusicPlayerService : Service() {
         setWakeLock()
 
         scope.launch {
-            while (!workoutData.isWorkoutFinished()) {
+            while (!countdownData.isWorkoutFinished()) {
                 println("MusicPlayerService Running")
-                workoutData.print()
+                countdownData.print()
 
                 // TODO Use Single Source of Truth
-                if (workoutData.isRestModeActive) {
-                    workoutData.restDuration -= 1
-                    if (workoutData.isCurrentSetRestFinished()) {
-                        workoutData = WorkoutData(
-                            id = workoutData.id,
+                if (countdownData.isRestModeActive) {
+                    countdownData.restDuration -= 1
+                    if (countdownData.isCurrentSetRestFinished()) {
+                        countdownData = CountdownData(
+                            id = countdownData.id,
                             isRestModeActive = false,
-                            setCount = workoutData.setCount - 1,
+                            setCount = countdownData.setCount - 1,
                             workDuration = _initialWorkoutDuration,
                             restDuration = _initialRestDuration
                         )
                     }
                     mediaPlayerManager.playAudio(R.raw.boxing_bell)
-                    if (workoutData.isWorkoutFinished()) {
+                    if (countdownData.isWorkoutFinished()) {
                         mediaPlayerManager.stopAudio()
                     }
                 } else {
-                    workoutData.workDuration -= 1
-                    if (workoutData.isCurrentSetWorkoutFinished()) {
+                    countdownData.workDuration -= 1
+                    if (countdownData.isCurrentSetWorkoutFinished()) {
                         mediaPlayerManager.playAudio(R.raw.boxing_bell)
-                        workoutData.isRestModeActive = true
+                        countdownData.isRestModeActive = true
                     }
                 }
                 delay(1000)

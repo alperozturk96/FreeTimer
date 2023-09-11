@@ -43,7 +43,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
-import com.coolnexttech.freetimer.model.WorkoutData
+import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.ui.theme.BorderColor
 import com.coolnexttech.freetimer.ui.theme.TertiaryColor
@@ -52,7 +52,7 @@ import com.coolnexttech.freetimer.viewmodel.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
-    val workoutData: WorkoutData by viewModel.workoutData.collectAsState()
+    val countdownData: CountdownData by viewModel.countdownData.collectAsState()
     val showSaveWorkoutAlert by viewModel.showSaveWorkoutAlert.collectAsState()
 
     var setCountText by remember {
@@ -78,7 +78,7 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
                 title = {},
                 actions = {
                     IconButton(onClick = {
-                        navController.navigate(Destinations.WorkoutDataList)
+                        navController.navigate(Destinations.CountdownDataList)
                     }) {
                         Icon(
                             Icons.Default.List,
@@ -90,7 +90,7 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
                     }) {
                         Icon(
                             Icons.Default.AddCircle,
-                            contentDescription = "Save workout data"
+                            contentDescription = "Save countdown data"
                         )
                     }
                 },
@@ -107,25 +107,25 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
             Spacer(modifier = Modifier.weight(1f))
 
             TimerInput(setCountText, label = stringResource(id = R.string.home_screen_set_count_input_placeholder), onValueChange = {
-                workoutData.setCount = it
+                countdownData.setCount = it
             }, updateText = {
                 setCountText = it
             })
 
             TimerInput(workoutDurationText, label = stringResource(id = R.string.home_screen_workout_duration_input_placeholder), onValueChange = {
-                workoutData.workDuration = it
+                countdownData.workDuration = it
             }, updateText = {
                 workoutDurationText = it
             })
 
             TimerInput(restDurationText, label = stringResource(id = R.string.home_screen_rest_duration_input_placeholder), onValueChange = {
-                workoutData.restDuration = it
+                countdownData.restDuration = it
             }, updateText = {
                 restDurationText = it
             })
 
             Button(onClick = {
-                Destinations.navigateToCountDownView(workoutData, context, navController)
+                Destinations.navigateToCountDownView(countdownData, context, navController)
             }) {
                 Text(text = stringResource(id = R.string.home_screen_start_timer_button_text), color = Color.Black)
             }
@@ -176,7 +176,7 @@ private fun SaveWorkoutAlertDialog(context: Context, viewModel: HomeViewModel, s
         },
         confirmButton = {
             TextButton(onClick = {
-                if (!viewModel.workoutData.value.isValid()) {
+                if (!viewModel.countdownData.value.isValid()) {
                     warningMessage = context.getString(R.string.home_screen_save_workout_alert_warning_text)
                 }
                 if (name.isEmpty()) {

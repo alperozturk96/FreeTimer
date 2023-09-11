@@ -7,14 +7,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.coolnexttech.freetimer.model.WorkoutData
+import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.model.toWorkoutData
 import com.coolnexttech.freetimer.view.countdown.CountDownView
+import com.coolnexttech.freetimer.view.countdownDataListView.CountdownDataListView
 import com.coolnexttech.freetimer.view.home.HomeView
-import com.coolnexttech.freetimer.view.workoutDataList.WorkoutDataListView
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
+import com.coolnexttech.freetimer.viewmodel.CountdownDataListViewModel
 import com.coolnexttech.freetimer.viewmodel.HomeViewModel
-import com.coolnexttech.freetimer.viewmodel.WorkoutDataListViewModel
 
 @Composable
 fun Navigation(navController: NavHostController, startDestination: String) {
@@ -24,19 +24,19 @@ fun Navigation(navController: NavHostController, startDestination: String) {
             HomeView(navController, viewModel)
         }
 
-        composable(Destinations.WorkoutDataList) {
-            val viewModel: WorkoutDataListViewModel = viewModel()
-            WorkoutDataListView(navController, viewModel)
+        composable(Destinations.CountdownDataList) {
+            val viewModel: CountdownDataListViewModel = viewModel()
+            CountdownDataListView(navController, viewModel)
         }
 
         composable(
-            route = Destinations.CountDown + "/" + "{workoutData}",
-            arguments = listOf(navArgument("workoutData") { type = NavType.StringType })
+            route = Destinations.CountDown + "/" + "{countdownData}",
+            arguments = listOf(navArgument("countdownData") { type = NavType.StringType })
         ) {
-            val json = it.arguments?.getString("workoutData")
-            val workoutData = json?.toWorkoutData() ?: WorkoutData()
+            val json = it.arguments?.getString("countdownData")
+            val countdownData = json?.toWorkoutData() ?: CountdownData()
             val viewModel: CountDownViewModel = viewModel()
-            CountDownView(navController, viewModel, workoutData)
+            CountDownView(navController, viewModel, countdownData)
         }
     }
 }

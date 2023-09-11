@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Free Timer</string>
 
+    <!-- HomeView -->
     <string name="home_screen_set_count_input_placeholder">Set Count</string>
     <string name="home_screen_workout_duration_input_placeholder">Workout Duration (In Second)</string>
     <string name="home_screen_rest_duration_input_placeholder">Rest Duration (In Second)</string>
     <string name="home_screen_start_timer_button_text">Start Timer</string>
-
 
     <string name="home_screen_save_workout_alert_title">Save Workout Data</string>
     <string name="home_screen_save_workout_alert_placeholder">Workout Name</string>
@@ -14,14 +14,20 @@
     <string name="home_screen_save_workout_alert_confirm_button_text">Save</string>
     <string name="home_screen_save_workout_alert_dismiss_button_text">Cancel</string>
 
+    <!-- CountDownView -->
     <string name="count_down_screen_set_count_info_text">SET\u0020</string>
     <string name="count_down_screen_work_duration_info_text">Time Left:\u0020</string>
     <string name="count_down_screen_rest_duration_info_text">Rest:\u0020</string>
 
-    <string name="count_down_screen_delete_workout_alert_title">Delete Workout Data</string>
-    <string name="count_down_screen_delete_workout_confirm_button">Delete</string>
-    <string name="count_down_screen_delete_workout_dismiss_button">Cancel</string>
+    <string name="count_down_screen_cancel_countdown_alert_title">Do you want to cancel countdown?</string>
+    <string name="count_down_screen_cancel_countdown_confirm_button">OK</string>
+    <string name="count_down_screen_cancel_countdown_dismiss_button">Cancel</string>
 
-    <string name="workout_data_list_screen_no_workout_data_text">No Workout Data</string>
+    <!-- CountdownDataListView -->
+    <string name="countdown_data_list_screen_delete_workout_alert_title">Delete Workout Data</string>
+    <string name="countdown_data_list_screen_delete_workout_confirm_button">Delete</string>
+    <string name="countdown_data_list_screen_delete_workout_dismiss_button">Cancel</string>
+
+    <string name="countdown_data_list_screen_no_workout_data_text">No Workout Data</string>
 
 </resources>

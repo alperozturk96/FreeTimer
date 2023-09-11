@@ -9,7 +9,7 @@ import com.google.gson.Gson
 import java.util.UUID
 
 @Entity
-data class WorkoutData(
+data class CountdownData(
     @PrimaryKey var id: UUID = UUID.randomUUID(),
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "is_rest_mode_active") var isRestModeActive: Boolean = false,
@@ -27,7 +27,7 @@ data class WorkoutData(
     }
 
     // TODO FIX
-    fun startCountDown(mediaPlayerManager: MediaPlayerManager, initialWorkoutDuration: Int, initialRestDuration: Int): WorkoutData {
+    fun startCountDown(mediaPlayerManager: MediaPlayerManager, initialWorkoutDuration: Int, initialRestDuration: Int): CountdownData {
         if (isRestModeActive) {
             restDuration -= 1
 
@@ -69,10 +69,10 @@ data class WorkoutData(
     }
 }
 
-fun WorkoutData.toJson(): String {
+fun CountdownData.toJson(): String {
     return Gson().toJson(this)
 }
 
-fun String.toWorkoutData(): WorkoutData {
-    return Gson().fromJson(this, WorkoutData::class.java)
+fun String.toWorkoutData(): CountdownData {
+    return Gson().fromJson(this, CountdownData::class.java)
 }

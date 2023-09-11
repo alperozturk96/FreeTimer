@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer.view.workoutDataList
+package com.coolnexttech.freetimer.view.countdownDataListView
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
@@ -33,16 +33,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
-import com.coolnexttech.freetimer.model.WorkoutData
-import com.coolnexttech.freetimer.ui.navigation.Destinations
+import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.ui.component.RoundedBox
-import com.coolnexttech.freetimer.viewmodel.WorkoutDataListViewModel
+import com.coolnexttech.freetimer.ui.navigation.Destinations
+import com.coolnexttech.freetimer.viewmodel.CountdownDataListViewModel
 
 @Composable
-fun WorkoutDataListView(navController: NavHostController, viewModel: WorkoutDataListViewModel) {
-    val workoutDataList by viewModel.workoutDataList.collectAsState()
+fun CountdownDataListView(navController: NavHostController, viewModel: CountdownDataListViewModel) {
+    val countdownDataList by viewModel.countdownDataList.collectAsState()
     var showDeleteAlert by remember { mutableStateOf(false) }
-    var selectedWorkoutData by remember { mutableStateOf(WorkoutData()) }
+    var selectedCountdownData by remember { mutableStateOf(CountdownData()) }
 
     val context = LocalContext.current
 
@@ -51,31 +51,31 @@ fun WorkoutDataListView(navController: NavHostController, viewModel: WorkoutData
         onDispose { }
     }
 
-    if (workoutDataList.isEmpty()) {
-        NoWorkoutDataText()
+    if (countdownDataList.isEmpty()) {
+        NoCountdownDataText()
     } else {
         LazyColumn(modifier = Modifier.padding(16.dp)) {
-            items(workoutDataList) { item ->
-                WorkoutDataListItemView(item, context, navController) {
+            items(countdownDataList) { item ->
+                CountdownDataListItemView(item, context, navController) {
                     showDeleteAlert = true
-                    selectedWorkoutData = item
+                    selectedCountdownData = item
                 }
             }
         }
     }
 
     if (showDeleteAlert) {
-        DeleteWorkoutDataAlertDialog(viewModel, selectedWorkoutData) {
+        DeleteCountdownDataAlertDialog(viewModel, selectedCountdownData) {
             showDeleteAlert = false
         }
     }
 }
 
 @Composable
-private fun NoWorkoutDataText() {
+private fun NoCountdownDataText() {
     Box(contentAlignment = Alignment.Center) {
         Text(
-            text = stringResource(id = R.string.workout_data_list_screen_no_workout_data_text),
+            text = stringResource(id = R.string.countdown_data_list_screen_no_workout_data_text),
             color = Color.Black,
             fontSize = 20.sp
         )
@@ -83,23 +83,23 @@ private fun NoWorkoutDataText() {
 }
 
 @Composable
-private fun DeleteWorkoutDataAlertDialog(
-    viewModel: WorkoutDataListViewModel,
-    workoutData: WorkoutData,
+private fun DeleteCountdownDataAlertDialog(
+    viewModel: CountdownDataListViewModel,
+    countdownData: CountdownData,
     dismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = { },
         title = {
-            Text(text = stringResource(id = R.string.count_down_screen_delete_workout_alert_title))
+            Text(text = stringResource(id = R.string.countdown_data_list_screen_delete_workout_alert_title))
         },
         confirmButton = {
             TextButton(onClick = {
-                viewModel.deleteWorkoutData(workoutData)
+                viewModel.deleteCountdownData(countdownData)
                 dismiss()
             }) {
                 Text(
-                    stringResource(id = R.string.count_down_screen_delete_workout_confirm_button),
+                    stringResource(id = R.string.countdown_data_list_screen_delete_workout_confirm_button),
                     color = Color.Black
                 )
             }
@@ -107,7 +107,7 @@ private fun DeleteWorkoutDataAlertDialog(
         dismissButton = {
             TextButton(onClick = { dismiss() }) {
                 Text(
-                    stringResource(id = R.string.count_down_screen_delete_workout_dismiss_button),
+                    stringResource(id = R.string.countdown_data_list_screen_delete_workout_dismiss_button),
                     color = Color.Black
                 )
             }
@@ -116,20 +116,20 @@ private fun DeleteWorkoutDataAlertDialog(
 }
 
 @Composable
-private fun WorkoutDataListItemView(
-    workoutData: WorkoutData,
+private fun CountdownDataListItemView(
+    countdownData: CountdownData,
     context: Context,
     navController: NavHostController,
     showDeleteAlert: () -> Unit
 ) {
     RoundedBox(action = {
-        Destinations.navigateToCountDownView(workoutData, context, navController)
+        Destinations.navigateToCountDownView(countdownData, context, navController)
     }) {
         Row {
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = workoutData.name,
+                text = countdownData.name,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .height(100.dp)
