@@ -106,28 +106,43 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
-            TimerInput(setCountText, label = stringResource(id = R.string.home_screen_set_count_input_placeholder), onValueChange = {
-                countdownData.setCount = it
-            }, updateText = {
-                setCountText = it
-            })
+            TimerInput(
+                setCountText,
+                label = stringResource(id = R.string.home_screen_set_count_input_placeholder),
+                onValueChange = {
+                    countdownData.setCount = it
+                },
+                updateText = {
+                    setCountText = it
+                })
 
-            TimerInput(workoutDurationText, label = stringResource(id = R.string.home_screen_workout_duration_input_placeholder), onValueChange = {
-                countdownData.workDuration = it
-            }, updateText = {
-                workoutDurationText = it
-            })
+            TimerInput(
+                workoutDurationText,
+                label = stringResource(id = R.string.home_screen_workout_duration_input_placeholder),
+                onValueChange = {
+                    countdownData.workDuration = it
+                },
+                updateText = {
+                    workoutDurationText = it
+                })
 
-            TimerInput(restDurationText, label = stringResource(id = R.string.home_screen_rest_duration_input_placeholder), onValueChange = {
-                countdownData.restDuration = it
-            }, updateText = {
-                restDurationText = it
-            })
+            TimerInput(
+                restDurationText,
+                label = stringResource(id = R.string.home_screen_rest_duration_input_placeholder),
+                onValueChange = {
+                    countdownData.restDuration = it
+                },
+                updateText = {
+                    restDurationText = it
+                })
 
             Button(onClick = {
                 Destinations.navigateToCountDownView(countdownData, context, navController)
             }) {
-                Text(text = stringResource(id = R.string.home_screen_start_timer_button_text), color = Color.Black)
+                Text(
+                    text = stringResource(id = R.string.home_screen_start_timer_button_text),
+                    color = Color.Black
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -145,7 +160,11 @@ fun HomeView(navController: NavHostController, viewModel: HomeViewModel) {
 }
 
 @Composable
-private fun SaveCountdownAlertDialog(context: Context, viewModel: HomeViewModel, saveCountdownData: () -> Unit) {
+private fun SaveCountdownAlertDialog(
+    context: Context,
+    viewModel: HomeViewModel,
+    saveCountdownData: () -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var warningMessage: String? = null
 
@@ -177,10 +196,12 @@ private fun SaveCountdownAlertDialog(context: Context, viewModel: HomeViewModel,
         confirmButton = {
             TextButton(onClick = {
                 if (!viewModel.countdownData.value.isValid()) {
-                    warningMessage = context.getString(R.string.home_screen_save_workout_alert_warning_text)
+                    warningMessage =
+                        context.getString(R.string.home_screen_save_workout_alert_warning_text)
                 }
                 if (name.isEmpty()) {
-                    warningMessage = context.getString(R.string.home_screen_save_workout_alert_warning_second_text)
+                    warningMessage =
+                        context.getString(R.string.home_screen_save_workout_alert_warning_second_text)
                 }
 
                 if (warningMessage != null) {
@@ -189,12 +210,18 @@ private fun SaveCountdownAlertDialog(context: Context, viewModel: HomeViewModel,
                     saveCountdownData()
                 }
             }) {
-                Text(stringResource(id = R.string.home_screen_save_workout_alert_confirm_button_text), color = Color.Black)
+                Text(
+                    stringResource(id = R.string.home_screen_save_workout_alert_confirm_button_text),
+                    color = Color.Black
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = { viewModel.hideSaveCountdownAlert() }) {
-                Text(stringResource(id = R.string.home_screen_save_workout_alert_dismiss_button_text), color = Color.Black)
+                Text(
+                    stringResource(id = R.string.home_screen_save_workout_alert_dismiss_button_text),
+                    color = Color.Black
+                )
             }
         }
     )

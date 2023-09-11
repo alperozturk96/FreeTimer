@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel: ViewModel() {
+class HomeViewModel : ViewModel() {
     private val _countdownData = MutableStateFlow(CountdownData())
     val countdownData: StateFlow<CountdownData> = _countdownData
 

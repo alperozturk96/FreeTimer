@@ -2,20 +2,23 @@ package com.coolnexttech.freetimer.view.countdownDataListView
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -36,8 +39,11 @@ import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.ui.navigation.Destinations
+import com.coolnexttech.freetimer.ui.theme.DangerColor
+import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 import com.coolnexttech.freetimer.viewmodel.CountdownDataListViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountdownDataListView(navController: NavHostController, viewModel: CountdownDataListViewModel) {
     val countdownDataList by viewModel.countdownDataList.collectAsState()
@@ -54,12 +60,40 @@ fun CountdownDataListView(navController: NavHostController, viewModel: Countdown
     if (countdownDataList.isEmpty()) {
         NoCountdownDataText()
     } else {
-        LazyColumn(modifier = Modifier.padding(16.dp)) {
+        LazyColumn(state = rememberLazyListState(), modifier = Modifier.padding(16.dp)) {
             items(countdownDataList) { item ->
-                CountdownDataListItemView(item, context, navController) {
-                    showDeleteAlert = true
-                    selectedCountdownData = item
-                }
+                val state = rememberDismissState(
+                    confirmValueChange = {
+                        if (it == DismissValue.DismissedToStart) {
+                            showDeleteAlert = true
+                            selectedCountdownData = item
+                        }
+                        true
+                    }
+                )
+
+                SwipeToDismiss(
+                    state = state,
+                    background = {
+                        val color = when (state.dismissDirection) {
+                            DismissDirection.EndToStart -> DangerColor
+                            DismissDirection.StartToEnd -> TertiaryColor
+                            null -> Color.Transparent
+                        }
+                        RoundedBox(
+                            backgroundColor = color
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete, contentDescription = "Delete",
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(end = 20.dp)
+                            )
+                        }
+                    },
+                    dismissContent = {
+                        CountdownDataListItemView(item, context, navController)
+                    })
             }
         }
     }
@@ -119,36 +153,17 @@ private fun DeleteCountdownDataAlertDialog(
 private fun CountdownDataListItemView(
     countdownData: CountdownData,
     context: Context,
-    navController: NavHostController,
-    showDeleteAlert: () -> Unit
+    navController: NavHostController
 ) {
     RoundedBox(action = {
         Destinations.navigateToCountDownView(countdownData, context, navController)
     }) {
-        Row {
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = countdownData.name,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .height(100.dp)
-                    .wrapContentHeight()
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(
-                modifier = Modifier.padding(vertical = 8.dp),
-                onClick = {
-                    showDeleteAlert()
-                }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    tint = Color.Black,
-                    contentDescription = "Delete workout data"
-                )
-            }
-        }
+        Text(
+            text = countdownData.name,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .height(100.dp)
+                .wrapContentHeight()
+        )
     }
 }

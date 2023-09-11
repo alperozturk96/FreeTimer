@@ -12,11 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 
 @Composable
-fun RoundedBox(widthFraction: Float = 1f, action: (() -> Unit)? = {}, content: @Composable BoxScope.() -> Unit) {
+fun RoundedBox(
+    backgroundColor: Color = TertiaryColor,
+    widthFraction: Float = 1f,
+    action: (() -> Unit)? = {},
+    content: @Composable BoxScope.() -> Unit
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -24,7 +30,7 @@ fun RoundedBox(widthFraction: Float = 1f, action: (() -> Unit)? = {}, content: @
             .height(100.dp)
             .padding(16.dp)
             .clip(shape = RoundedCornerShape(30.dp))
-            .background(TertiaryColor)
+            .background(backgroundColor)
             .clickable(enabled = action != null) { action?.invoke() }
     ) {
         content()

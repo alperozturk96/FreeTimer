@@ -17,7 +17,6 @@ import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initial
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
@@ -72,7 +71,11 @@ class MusicPlayerService : Service() {
                 println("MusicPlayerService Running")
 
                 countdownData.update {
-                    it.startCountDown(mediaPlayerManager, initialWorkoutDuration, initialRestDuration)
+                    it.startCountDown(
+                        mediaPlayerManager,
+                        initialWorkoutDuration,
+                        initialRestDuration
+                    )
                 }
                 delay(1000)
             }

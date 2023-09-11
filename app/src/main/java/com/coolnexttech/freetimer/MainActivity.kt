@@ -25,7 +25,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             FreeTimerTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     RootView()
                 }
             }
