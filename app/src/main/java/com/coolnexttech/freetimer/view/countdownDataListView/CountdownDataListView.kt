@@ -68,7 +68,7 @@ fun CountdownDataListView(navController: NavHostController, viewModel: Countdown
                             showDeleteAlert = true
                             selectedCountdownData = item
                         }
-                        true
+                        false
                     }
                 )
 
