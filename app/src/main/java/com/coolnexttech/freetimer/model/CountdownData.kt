@@ -68,9 +68,9 @@ fun CountdownData.startCountDown(
                 workDuration = initialWorkoutDuration
                 restDuration = initialRestDuration
             }
-        }
 
-        mediaPlayerManager.playAudio(R.raw.boxing_bell)
+            mediaPlayerManager.playAudio(R.raw.boxing_bell)
+        }
 
         if (updatedVal.isWorkoutFinished()) {
             mediaPlayerManager.stopAudio()
