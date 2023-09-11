@@ -81,15 +81,18 @@ fun CountdownDataListView(navController: NavHostController, viewModel: Countdown
                             DismissDirection.StartToEnd -> TertiaryColor
                             null -> Color.Transparent
                         }
-                        RoundedBox(
-                            backgroundColor = color
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete, contentDescription = "Delete",
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .padding(end = 20.dp)
-                            )
+                        Column {
+                            Spacer(modifier = Modifier.padding(top = 10.dp))
+                            RoundedBox(
+                                backgroundColor = color
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete, contentDescription = "Delete",
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(end = 20.dp)
+                                )
+                            }
                         }
                     },
                     dismissContent = {
