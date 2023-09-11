@@ -16,36 +16,33 @@ import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initial
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel.Companion.initialWorkoutDuration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MusicPlayerService : Service() {
     private var mediaPlayerManager = MediaPlayerManager(this)
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
     private var wakeLock: PowerManager.WakeLock? = null
-
-    companion object {
-        var canStartService = true
-    }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!canStartService) {
-            stopSelf()
-            return START_STICKY
-        }
-
         println("MusicPlayerService Started")
 
         when (intent?.action) {
             Actions.Start.toString() -> startService()
-            Actions.Stop.toString() -> stopSelf()
+            Actions.Stop.toString() -> {
+                scope.cancel()
+                stopSelf()
+            }
         }
+
         return START_STICKY
     }
 
@@ -73,6 +70,7 @@ class MusicPlayerService : Service() {
         scope.launch {
             while (!countdownData.value.isWorkoutFinished()) {
                 println("MusicPlayerService Running")
+
                 countdownData.update {
                     it.startCountDown(mediaPlayerManager, initialWorkoutDuration, initialRestDuration)
                 }

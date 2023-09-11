@@ -31,21 +31,20 @@ import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.service.MusicPlayerService
 import com.coolnexttech.freetimer.ui.component.RoundedBox
-import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.viewmodel.CountDownViewModel
 
 @Composable
 fun CountDownView(
-    navController: NavHostController, viewModel: CountDownViewModel, initialCountdownData: CountdownData
+    navController: NavHostController,
+    viewModel: CountDownViewModel,
+    initialCountdownData: CountdownData
 ) {
     val context: Context = LocalContext.current
     val notificationManager = CountdownTimerNotificationManager(context)
     val serviceIntent = Intent(context, MusicPlayerService::class.java)
     val countdownData by CountDownViewModel.countdownData.collectAsState()
     var showCancelCountdownAlert by remember { mutableStateOf(false) }
-    val isCountDownCompleted by viewModel.isCountDownCompleted.collectAsState()
 
-    // FIXME Service still working
     BackHandler {
         showCancelCountdownAlert = true
     }
@@ -58,23 +57,30 @@ fun CountDownView(
         }
     }
 
-    if (isCountDownCompleted) {
-        navigateBackToHome(navController)
+    if (countdownData.isWorkoutFinished()) {
+        finishCountdown(navController, context, serviceIntent, notificationManager)
     }
 
     if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
-            MusicPlayerService.canStartService = false
-            viewModel.finishCountDown()
-            notificationManager.deleteNotificationChannel()
-            stopMusicPlayerService(context, serviceIntent)
-            navController.popBackStack()
+            finishCountdown(navController, context, serviceIntent, notificationManager)
         }, dismiss = {
             showCancelCountdownAlert = false
         })
     }
 
     CountDownViewState(countdownData, notificationManager)
+}
+
+private fun finishCountdown(
+    navController: NavHostController,
+    context: Context,
+    serviceIntent: Intent,
+    notificationManager: CountdownTimerNotificationManager
+) {
+    notificationManager.deleteNotificationChannel()
+    stopMusicPlayerService(context, serviceIntent)
+    navController.popBackStack()
 }
 
 @Composable
@@ -115,14 +121,6 @@ private fun startMusicPlayerService(
 private fun stopMusicPlayerService(context: Context, serviceIntent: Intent) {
     serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
     context.startService(serviceIntent)
-}
-
-private fun navigateBackToHome(navController: NavHostController) {
-    navController.navigate(Destinations.Home) {
-        popUpTo(Destinations.Home) {
-            inclusive = true
-        }
-    }
 }
 
 @Composable
