@@ -26,32 +26,6 @@ data class CountdownData(
         println("Countdown RestDuration: $restDuration")
     }
 
-    // TODO FIX
-    fun startCountDown(mediaPlayerManager: MediaPlayerManager, initialWorkoutDuration: Int, initialRestDuration: Int): CountdownData {
-        if (isRestModeActive) {
-            restDuration -= 1
-
-            if (isCurrentSetRestFinished()) {
-                isRestModeActive = false
-                setCount -= 1
-                workDuration = initialWorkoutDuration
-                restDuration = initialRestDuration
-            }
-            mediaPlayerManager.playAudio(R.raw.boxing_bell)
-            if (isWorkoutFinished()) {
-                mediaPlayerManager.stopAudio()
-            }
-        } else {
-            workDuration -= 1
-            if (isCurrentSetWorkoutFinished()) {
-                mediaPlayerManager.playAudio(R.raw.boxing_bell)
-                isRestModeActive = true
-            }
-        }
-
-        return this
-    }
-
     fun isValid(): Boolean {
         return setCount > 0 && workDuration > 0 && restDuration > 0
     }
@@ -71,6 +45,51 @@ data class CountdownData(
 
 fun CountdownData.toJson(): String {
     return Gson().toJson(this)
+}
+
+fun CountdownData.startCountDown(
+    mediaPlayerManager: MediaPlayerManager,
+    initialWorkoutDuration: Int,
+    initialRestDuration: Int
+): CountdownData {
+    val updatedVal = this.copy()
+
+    updatedVal.print()
+
+    if (updatedVal.isRestModeActive) {
+        updatedVal.apply {
+            restDuration--
+        }
+
+        if (updatedVal.isCurrentSetRestFinished()) {
+            updatedVal.apply {
+                isRestModeActive = false
+                setCount--
+                workDuration = initialWorkoutDuration
+                restDuration = initialRestDuration
+            }
+        }
+
+        mediaPlayerManager.playAudio(R.raw.boxing_bell)
+
+        if (updatedVal.isWorkoutFinished()) {
+            mediaPlayerManager.stopAudio()
+        }
+    } else {
+        updatedVal.apply {
+            workDuration--
+        }
+
+        if (updatedVal.isCurrentSetWorkoutFinished()) {
+            mediaPlayerManager.playAudio(R.raw.boxing_bell)
+
+            updatedVal.apply {
+                isRestModeActive = true
+            }
+        }
+    }
+
+    return updatedVal
 }
 
 fun String.toCountdownData(): CountdownData {

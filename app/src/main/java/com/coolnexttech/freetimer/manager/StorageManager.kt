@@ -3,8 +3,8 @@ package com.coolnexttech.freetimer.manager
 import android.annotation.SuppressLint
 import android.content.Context
 import com.coolnexttech.freetimer.model.CountdownData
-import com.coolnexttech.freetimer.model.toJson
 import com.coolnexttech.freetimer.model.toCountdownData
+import com.coolnexttech.freetimer.model.toJson
 
 class StorageManager(context: Context) {
     private val sharedPreferences = context.getSharedPreferences("FreeTimer", Context.MODE_PRIVATE)

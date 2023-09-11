@@ -12,6 +12,7 @@ import android.os.SystemClock
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.coolnexttech.freetimer.model.CountdownData
+import com.coolnexttech.freetimer.model.startCountDown
 import com.coolnexttech.freetimer.model.toCountdownData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,31 +83,7 @@ class MusicPlayerService : Service() {
         scope.launch {
             while (!countdownData.isWorkoutFinished()) {
                 println("MusicPlayerService Running")
-                countdownData.print()
-
-                // TODO Use Single Source of Truth
-                if (countdownData.isRestModeActive) {
-                    countdownData.restDuration -= 1
-                    if (countdownData.isCurrentSetRestFinished()) {
-                        countdownData = CountdownData(
-                            id = countdownData.id,
-                            isRestModeActive = false,
-                            setCount = countdownData.setCount - 1,
-                            workDuration = _initialWorkoutDuration,
-                            restDuration = _initialRestDuration
-                        )
-                    }
-                    mediaPlayerManager.playAudio(R.raw.boxing_bell)
-                    if (countdownData.isWorkoutFinished()) {
-                        mediaPlayerManager.stopAudio()
-                    }
-                } else {
-                    countdownData.workDuration -= 1
-                    if (countdownData.isCurrentSetWorkoutFinished()) {
-                        mediaPlayerManager.playAudio(R.raw.boxing_bell)
-                        countdownData.isRestModeActive = true
-                    }
-                }
+                countdownData = countdownData.startCountDown(mediaPlayerManager, _initialWorkoutDuration, _initialRestDuration)
                 delay(1000)
             }
         }
