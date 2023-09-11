@@ -8,12 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.coolnexttech.freetimer.model.CountdownData
-import com.coolnexttech.freetimer.model.setupCountdownData
 import com.coolnexttech.freetimer.model.toCountdownData
 import com.coolnexttech.freetimer.view.countdown.CountDownView
 import com.coolnexttech.freetimer.view.countdownDataListView.CountdownDataListView
 import com.coolnexttech.freetimer.view.home.HomeView
 import com.coolnexttech.freetimer.viewmodel.CountdownDataListViewModel
+import com.coolnexttech.freetimer.viewmodel.CountdownViewModel
 import com.coolnexttech.freetimer.viewmodel.HomeViewModel
 
 @Composable
@@ -35,9 +35,10 @@ fun Navigation(navController: NavHostController, startDestination: String) {
         ) {
             val json = it.arguments?.getString("countdownData")
             val countdownData = json?.toCountdownData() ?: CountdownData()
-            setupCountdownData(countdownData)
 
-            CountDownView(navController)
+            val viewModel: CountdownViewModel = viewModel()
+            viewModel.setupCountdownData(countdownData)
+            CountDownView(navController, viewModel)
         }
     }
 }

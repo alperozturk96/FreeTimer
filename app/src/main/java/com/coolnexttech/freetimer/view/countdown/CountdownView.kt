@@ -1,7 +1,6 @@
 package com.coolnexttech.freetimer.view.countdown
 
 import android.content.Context
-import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,21 +30,17 @@ import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.CountdownTimerNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
-import com.coolnexttech.freetimer.model.countdownData
-import com.coolnexttech.freetimer.model.resetCountDownData
-import com.coolnexttech.freetimer.service.MusicPlayerService
 import com.coolnexttech.freetimer.ui.component.RoundedBox
 import com.coolnexttech.freetimer.ui.theme.PrimaryColor
+import com.coolnexttech.freetimer.viewmodel.CountdownViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun CountDownView(
-    navController: NavHostController) {
+fun CountDownView(navController: NavHostController, viewModel: CountdownViewModel) {
     val context: Context = LocalContext.current
 
     val notificationManager = CountdownTimerNotificationManager(context)
-    val serviceIntent = Intent(context, MusicPlayerService::class.java)
-    val countdownData by countdownData.collectAsState()
+    val countdownData by viewModel.countdownData.collectAsState()
     var showCancelCountdownAlert by remember { mutableStateOf(false) }
 
     var dimScreen by remember { mutableStateOf(false) }
@@ -62,16 +57,16 @@ fun CountDownView(
     }
 
     LaunchedEffect(true) {
-        startMusicPlayerService(context, serviceIntent)
+        viewModel.init(context)
     }
 
     if (countdownData.isWorkoutFinished()) {
-        finishCountdown(navController, context, serviceIntent, notificationManager)
+        finishCountdown(navController, notificationManager)
     }
 
     if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
-            finishCountdown(navController, context, serviceIntent, notificationManager)
+            finishCountdown(navController, notificationManager)
         }, dismiss = {
             showCancelCountdownAlert = false
         })
@@ -174,24 +169,8 @@ private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () 
 
 private fun finishCountdown(
     navController: NavHostController,
-    context: Context,
-    serviceIntent: Intent,
     notificationManager: CountdownTimerNotificationManager
 ) {
     notificationManager.deleteNotificationChannel()
-    stopMusicPlayerService(context, serviceIntent)
-    resetCountDownData()
     navController.popBackStack()
-}
-
-private fun startMusicPlayerService(
-    context: Context, serviceIntent: Intent
-) {
-    serviceIntent.action = MusicPlayerService.Actions.Start.toString()
-    context.startService(serviceIntent)
-}
-
-private fun stopMusicPlayerService(context: Context, serviceIntent: Intent) {
-    serviceIntent.action = MusicPlayerService.Actions.Stop.toString()
-    context.startService(serviceIntent)
 }
