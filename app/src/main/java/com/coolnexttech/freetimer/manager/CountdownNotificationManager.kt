@@ -4,9 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 
-class CountdownNotificationManager(private val context: Context) {
+class CountdownNotificationManager(context: Context) {
     private val channelId = "CountdownTimerServiceChannelId"
     private val notificationName = "CountdownTimerServiceNotificationName"
     private val notificationId = 1
