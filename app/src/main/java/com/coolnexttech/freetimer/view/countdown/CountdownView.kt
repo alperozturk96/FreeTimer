@@ -8,7 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -24,7 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
@@ -34,6 +44,7 @@ import com.coolnexttech.freetimer.extension.hideSystemBar
 import com.coolnexttech.freetimer.manager.CountdownNotificationManager
 import com.coolnexttech.freetimer.model.CountdownData
 import com.coolnexttech.freetimer.ui.component.RoundedBox
+import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 import com.coolnexttech.freetimer.viewmodel.CountdownViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -87,9 +98,9 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     context.findActivity().hideNavBar(dimScreen)
 
     val notificationIconId = if (dimScreen) {
-        R.drawable.im_black
+        R.drawable.ic_circle
     } else {
-        R.drawable.im_timer
+        R.drawable.ic_timer
     }
     notificationManager.createNotificationChannel()
     notificationManager.createNotification(timeLeft, notificationIconId)
@@ -101,6 +112,13 @@ private fun CountDownViewState(
     countdownData: CountdownData,
     lockScreen: () -> Unit
 ) {
+    var play by remember { mutableStateOf(false) }
+    val playAndPauseButtonIconId = if (play) {
+        R.drawable.ic_play
+    } else {
+        R.drawable.ic_pause
+    }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -108,6 +126,15 @@ private fun CountDownViewState(
         Spacer(modifier = Modifier.weight(1f))
         InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
         InfoText(text = timeLeft)
+        IconButton(onClick = { play = !play }) {
+            Icon(
+                painter = painterResource(id = playAndPauseButtonIconId),
+                tint = TertiaryColor,
+                modifier = Modifier.size(48.dp),
+                contentDescription = "Play and Pause",
+            )
+        }
+        Spacer(modifier = Modifier.height(40.dp))
         Text(text = stringResource(id = R.string.count_down_screen_switch_text))
         Switch(
             checked = false,
