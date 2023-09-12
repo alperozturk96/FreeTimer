@@ -74,6 +74,7 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
 
     if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
+            showCancelCountdownAlert = false
             finishCountdown(navController, notificationManager)
         }, dismiss = {
             showCancelCountdownAlert = false
@@ -98,8 +99,7 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     } else {
         R.drawable.ic_timer
     }
-    notificationManager.createNotificationChannel()
-    notificationManager.createNotification(timeLeft, notificationIconId)
+    notificationManager.updateNotification(timeLeft, notificationIconId)
 }
 
 @Composable
