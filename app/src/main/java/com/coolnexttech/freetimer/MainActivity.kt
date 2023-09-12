@@ -3,6 +3,7 @@ package com.coolnexttech.freetimer
 import android.app.Activity
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    keepScreenOn()
                     RootView()
                 }
             }
@@ -50,5 +52,9 @@ class MainActivity : ComponentActivity() {
                 0
             )
         }
+    }
+
+    private fun keepScreenOn() {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 }
