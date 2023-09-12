@@ -12,10 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 
 class CountdownViewModel: ViewModel() {
     private var _countdownData = MutableStateFlow(CountdownData())
     val countdownData: StateFlow<CountdownData> = _countdownData
+
+    private var _play = MutableStateFlow(true)
+    val play: StateFlow<Boolean> = _play
 
     private var initialWorkoutDuration = 0
     private var initialRestDuration = 0
@@ -37,7 +41,13 @@ class CountdownViewModel: ViewModel() {
     private fun startCountDown(mediaPlayerManager: MediaPlayerManager) {
         viewModelScope.launch(Dispatchers.Main) {
             while (!_countdownData.value.isWorkoutFinished()) {
-                println("MusicPlayerService Running")
+                if (!_play.value) {
+                    println("CountDown Stopped")
+                    yield()
+                    continue
+                }
+
+                println("CountDown Started Running")
 
                 _countdownData.update {
                     it.startCountDown(
@@ -50,6 +60,12 @@ class CountdownViewModel: ViewModel() {
             }
 
             println("Job is done")
+        }
+    }
+
+    fun togglePlayButton(value: Boolean) {
+        _play.update {
+            value
         }
     }
 }

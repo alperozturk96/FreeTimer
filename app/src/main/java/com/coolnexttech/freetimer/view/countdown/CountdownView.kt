@@ -9,11 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -89,7 +85,7 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
             dimScreen = false
         }
     } else {
-        CountDownViewState(timeLeft, countdownData) {
+        CountDownViewState(timeLeft, countdownData, viewModel) {
             dimScreen = true
         }
     }
@@ -110,10 +106,12 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
 private fun CountDownViewState(
     timeLeft: String,
     countdownData: CountdownData,
+    viewModel: CountdownViewModel,
     lockScreen: () -> Unit
 ) {
-    var play by remember { mutableStateOf(false) }
-    val playAndPauseButtonIconId = if (play) {
+    val play by viewModel.play.collectAsState()
+
+    val playAndPauseButtonIconId = if (!play) {
         R.drawable.ic_play
     } else {
         R.drawable.ic_pause
@@ -126,7 +124,7 @@ private fun CountDownViewState(
         Spacer(modifier = Modifier.weight(1f))
         InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
         InfoText(text = timeLeft)
-        IconButton(onClick = { play = !play }) {
+        IconButton(onClick = { viewModel.togglePlayButton(!play) }) {
             Icon(
                 painter = painterResource(id = playAndPauseButtonIconId),
                 tint = TertiaryColor,
