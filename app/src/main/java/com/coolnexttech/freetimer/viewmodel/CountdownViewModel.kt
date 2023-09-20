@@ -25,6 +25,12 @@ class CountdownViewModel: ViewModel() {
     fun init(context: Context) {
         val mediaPlayerManager = MediaPlayerManager(context)
         startCountDown(mediaPlayerManager)
+
+        if (!play.value) {
+            play.update {
+                true
+            }
+        }
     }
 
     fun setupCountdownData(data: CountdownData) {

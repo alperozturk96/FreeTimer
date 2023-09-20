@@ -126,9 +126,9 @@ private fun getNotificationData(
     }
     val actionTitle: String = context.getString(
         if (!play) {
-            R.string.count_down_screen_notification_resume_action_button_title
+            R.string.count_down_screen_notification_resume_action_title
         } else {
-            R.string.count_down_screen_notification_stop_action_button_title
+            R.string.count_down_screen_notification_pause_action_title
         }
     )
 
