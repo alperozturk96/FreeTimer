@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.coolnexttech.freetimer.model.CountdownData
+import com.coolnexttech.freetimer.model.play
 import com.coolnexttech.freetimer.model.startCountDown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,9 +18,6 @@ import kotlinx.coroutines.yield
 class CountdownViewModel: ViewModel() {
     private var _countdownData = MutableStateFlow(CountdownData())
     val countdownData: StateFlow<CountdownData> = _countdownData
-
-    private var _play = MutableStateFlow(true)
-    val play: StateFlow<Boolean> = _play
 
     private var initialWorkoutDuration = 0
     private var initialRestDuration = 0
@@ -41,7 +39,7 @@ class CountdownViewModel: ViewModel() {
     private fun startCountDown(mediaPlayerManager: MediaPlayerManager) {
         viewModelScope.launch(Dispatchers.Main) {
             while (!_countdownData.value.isWorkoutFinished()) {
-                if (!_play.value) {
+                if (!play.value) {
                     println("CountDown Stopped")
                     yield()
                     continue
@@ -60,12 +58,6 @@ class CountdownViewModel: ViewModel() {
             }
 
             println("Job is done")
-        }
-    }
-
-    fun togglePlayButton(value: Boolean) {
-        _play.update {
-            value
         }
     }
 }

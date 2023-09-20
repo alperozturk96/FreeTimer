@@ -1,4 +1,4 @@
-package com.coolnexttech.freetimer
+package com.coolnexttech.freetimer.app
 
 import android.app.Activity
 import android.os.Build

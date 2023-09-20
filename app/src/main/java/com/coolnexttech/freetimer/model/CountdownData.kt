@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import java.util.UUID
 
 @Entity
@@ -40,6 +42,14 @@ data class CountdownData(
 
     fun isWorkoutFinished(): Boolean {
         return setCount == 0
+    }
+}
+
+var play = MutableStateFlow(true)
+
+fun togglePlayButton(value: Boolean) {
+    play.update {
+        value
     }
 }
 
