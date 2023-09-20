@@ -6,14 +6,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +48,7 @@ import com.coolnexttech.freetimer.model.play
 import com.coolnexttech.freetimer.model.togglePlayButton
 import com.coolnexttech.freetimer.notification.CountdownNotificationService
 import com.coolnexttech.freetimer.ui.component.RoundedBox
+import com.coolnexttech.freetimer.ui.theme.PrimaryColor
 import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 import com.coolnexttech.freetimer.viewmodel.CountdownViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -105,7 +111,14 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     context.findActivity().hideNavBar(dimScreen)
 
     countdownNotificationService.showNotification(
-        getNotificationData(context, dimScreen, play, timeLeft, playAndPauseButtonIconId, countdownData)
+        getNotificationData(
+            context,
+            dimScreen,
+            play,
+            timeLeft,
+            playAndPauseButtonIconId,
+            countdownData
+        )
     )
 }
 
@@ -156,22 +169,25 @@ private fun CountDownViewState(
         Spacer(modifier = Modifier.weight(1f))
         InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
         InfoText(text = timeLeft)
-        IconButton(onClick = { togglePlayButton(!play) }) {
-            Icon(
-                painter = painterResource(id = playAndPauseButtonIconId),
-                tint = TertiaryColor,
-                modifier = Modifier.size(48.dp),
-                contentDescription = "Play and Pause",
-            )
-        }
-        Spacer(modifier = Modifier.height(40.dp))
-        Text(text = stringResource(id = R.string.count_down_screen_switch_text))
-        Switch(
-            checked = false,
-            onCheckedChange = {
-                lockScreen()
+        Row {
+            IconButton(onClick = { togglePlayButton(!play) }) {
+                Icon(
+                    painter = painterResource(id = playAndPauseButtonIconId),
+                    tint = TertiaryColor,
+                    modifier = Modifier.size(48.dp),
+                    contentDescription = "Play and Pause",
+                )
             }
-        )
+            Spacer(modifier = Modifier.width(20.dp))
+            IconButton(onClick = { lockScreen() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sleep),
+                    tint = TertiaryColor,
+                    modifier = Modifier.size(48.dp),
+                    contentDescription = "Dim Screen",
+                )
+            }
+        }
         Spacer(modifier = Modifier.weight(1f))
     }
 }
