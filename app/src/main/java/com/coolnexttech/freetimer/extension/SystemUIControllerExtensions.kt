@@ -7,7 +7,6 @@ import com.google.accompanist.systemuicontroller.SystemUiController
 fun SystemUiController.hideSystemBar(hide: Boolean) {
     if (hide) {
         setSystemBarsColor(
-            isNavigationBarContrastEnforced = false,
             darkIcons = true,
             color = Color.Black
         )

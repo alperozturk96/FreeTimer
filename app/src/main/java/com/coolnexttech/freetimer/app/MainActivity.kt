@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
+import com.coolnexttech.freetimer.extension.hideSystemBar
 import com.coolnexttech.freetimer.ui.navigation.Destinations
 import com.coolnexttech.freetimer.ui.navigation.Navigation
 import com.coolnexttech.freetimer.ui.theme.FreeTimerTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 class MainActivity: ComponentActivity() {
 
@@ -30,6 +32,7 @@ class MainActivity: ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    SetSystemBarColor()
                     keepScreenOn()
                     RootView()
                 }
@@ -51,6 +54,12 @@ class MainActivity: ComponentActivity() {
                 0
             )
         }
+    }
+
+    @Composable
+    private fun SetSystemBarColor() {
+        val systemUiController = rememberSystemUiController()
+        systemUiController.hideSystemBar(false)
     }
 
     private fun keepScreenOn() {
