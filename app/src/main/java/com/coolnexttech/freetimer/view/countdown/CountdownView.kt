@@ -99,7 +99,9 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     } else {
         R.drawable.ic_timer
     }
-    notificationManager.updateNotification(timeLeft, notificationIconId)
+
+    val setCountInfo = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount.toString()
+    notificationManager.updateNotification(setCountInfo, timeLeft, notificationIconId)
 }
 
 @Composable

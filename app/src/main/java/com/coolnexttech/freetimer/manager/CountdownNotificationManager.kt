@@ -14,19 +14,21 @@ class CountdownNotificationManager(context: Context) {
     private val importance = NotificationManager.IMPORTANCE_DEFAULT
     private val channel = NotificationChannel(channelId, notificationName, importance)
 
-    init {
-        createNotificationChannel()
-    }
-
     private val notification = NotificationCompat.Builder(context, channelId)
         .setPriority(NotificationCompat.PRIORITY_LOW)
         .setSilent(true)
 
-    fun updateNotification(timeLeft: String, iconId: Int) {
+    init {
+        createNotificationChannel()
+    }
+
+    fun updateNotification(setCount: String, timeLeft: String, iconId: Int) {
         notification.apply {
+            setContentTitle(setCount)
             setContentText(timeLeft)
             setSmallIcon(iconId)
         }
+
         nm.notify(notificationId, notification.build())
     }
 
