@@ -38,6 +38,7 @@ import com.coolnexttech.freetimer.extension.findActivity
 import com.coolnexttech.freetimer.extension.hideNavBar
 import com.coolnexttech.freetimer.extension.hideSystemBar
 import com.coolnexttech.freetimer.model.CountdownData
+import com.coolnexttech.freetimer.model.NotificationData
 import com.coolnexttech.freetimer.model.play
 import com.coolnexttech.freetimer.model.togglePlayButton
 import com.coolnexttech.freetimer.notification.CountdownNotificationService
@@ -59,14 +60,6 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     } else {
         R.drawable.ic_pause
     }
-
-    val actionTitle: String = stringResource(
-        id = if (!play) {
-            R.string.count_down_screen_notification_resume_action_button_title
-        } else {
-            R.string.count_down_screen_notification_stop_action_button_title
-        }
-    )
 
     val timeLeft: String = if (countdownData.isRestModeActive) {
         stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
@@ -111,16 +104,35 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     systemUiController.hideSystemBar(dimScreen)
     context.findActivity().hideNavBar(dimScreen)
 
+    countdownNotificationService.showNotification(
+        getNotificationData(context, dimScreen, play, timeLeft, playAndPauseButtonIconId, countdownData)
+    )
+}
+
+private fun getNotificationData(
+    context: Context,
+    dimScreen: Boolean,
+    play: Boolean,
+    timeLeft: String,
+    playAndPauseButtonIconId: Int,
+    countdownData: CountdownData
+): NotificationData {
+    val setCountInfo =
+        context.getString(R.string.count_down_screen_set_count_info_text) + countdownData.setCount.toString()
     val notificationIconId = if (dimScreen) {
         R.drawable.ic_circle
     } else {
         R.drawable.ic_timer
     }
+    val actionTitle: String = context.getString(
+        if (!play) {
+            R.string.count_down_screen_notification_resume_action_button_title
+        } else {
+            R.string.count_down_screen_notification_stop_action_button_title
+        }
+    )
 
-    val setCountInfo =
-        stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount.toString()
-
-    countdownNotificationService.showNotification(
+    return NotificationData(
         setCountInfo,
         timeLeft,
         notificationIconId,

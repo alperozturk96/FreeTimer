@@ -5,33 +5,35 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import com.coolnexttech.freetimer.model.NotificationData
 
-class CountdownNotificationService(private val context: Context) {
+class CountdownNotificationService(context: Context) {
 
     companion object {
         const val channelId = "CountdownTimerServiceChannelId"
     }
 
-    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val resumeAndPauseAction = PendingIntent.getBroadcast(
+        context,
+        2,
+        Intent(context, CountdownNotificationReceiver::class.java),
+        PendingIntent.FLAG_IMMUTABLE
+    )
+    private val notificationBuilder = NotificationCompat.Builder(context, channelId)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setSilent(true)
 
-    fun showNotification(setCount: String, timeLeft: String, iconId: Int, actionIconId: Int, actionTitle: String) {
-        val resumeAndPauseAction = PendingIntent.getBroadcast(
-            context,
-            2,
-            Intent(context, CountdownNotificationReceiver::class.java),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+    fun showNotification(data: NotificationData) {
+        notificationBuilder.apply {
+            setContentTitle(data.setCount)
+            setContentText(data.timeLeft)
+            setSmallIcon(data.iconId)
+            addAction(data.actionIconId, data.actionTitle, resumeAndPauseAction)
+        }
 
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setContentTitle(setCount)
-            .setContentText(timeLeft)
-            .setSmallIcon(iconId)
-            .setSilent(true)
-            .addAction(actionIconId, actionTitle, resumeAndPauseAction)
-            .build()
-
-        notificationManager.notify(1, notification)
+        notificationManager.notify(1, notificationBuilder.build())
     }
 
     fun cancelNotification() {
