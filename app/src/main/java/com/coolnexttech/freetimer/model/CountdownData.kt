@@ -1,13 +1,12 @@
 package com.coolnexttech.freetimer.model
 
+import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import java.util.UUID
 
 @Entity
@@ -28,6 +27,18 @@ data class CountdownData(
         println("Countdown RestDuration: $restDuration")
     }
 
+    fun getTimeLeftInfo(context: Context): String {
+        return if (isRestModeActive) {
+            context.getString(R.string.count_down_screen_rest_duration_info_text) + restDuration
+        } else {
+            context.getString(R.string.count_down_screen_work_duration_info_text) + workDuration
+        }
+    }
+
+    fun getSetCountInfo(context: Context): String {
+        return context.getString(R.string.count_down_screen_set_count_info_text) + setCount
+    }
+
     fun isValid(): Boolean {
         return setCount > 0 && workDuration > 0 && restDuration > 0
     }
@@ -42,14 +53,6 @@ data class CountdownData(
 
     fun isWorkoutFinished(): Boolean {
         return setCount == 0
-    }
-}
-
-var play = MutableStateFlow(true)
-
-fun togglePlayButton(value: Boolean) {
-    play.update {
-        value
     }
 }
 

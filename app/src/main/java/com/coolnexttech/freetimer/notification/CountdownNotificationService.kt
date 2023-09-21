@@ -5,9 +5,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import com.coolnexttech.freetimer.model.NotificationData
+import com.coolnexttech.freetimer.model.CountdownController
 
-class CountdownNotificationService(context: Context) {
+class CountdownNotificationService(private val context: Context) {
 
     companion object {
         const val channelId = "CountdownTimerServiceChannelId"
@@ -15,25 +15,27 @@ class CountdownNotificationService(context: Context) {
 
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
     private val resumeAndPauseAction = PendingIntent.getBroadcast(
         context,
         2,
         Intent(context, CountdownNotificationReceiver::class.java),
         PendingIntent.FLAG_IMMUTABLE
     )
-    private val notificationBuilder = NotificationCompat.Builder(context, channelId)
-        .setPriority(NotificationCompat.PRIORITY_LOW)
-        .setSilent(true)
 
-    fun showNotification(data: NotificationData) {
-        notificationBuilder.apply {
-            setContentTitle(data.setCount)
-            setContentText(data.timeLeft)
-            setSmallIcon(data.iconId)
-            addAction(data.actionIconId, data.actionTitle, resumeAndPauseAction)
-        }
+    fun showNotification(setCountInfo: String, timeLeftInfo: String, iconId: Int) {
+        val notificationActionTitle = context.getString(CountdownController.data.value.notificationActionTitleId)
 
-        notificationManager.notify(1, notificationBuilder.build())
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentTitle(setCountInfo)
+            .setContentText(timeLeftInfo)
+            .setSmallIcon(iconId)
+            .addAction(CountdownController.data.value.controlButtonIconId, notificationActionTitle, resumeAndPauseAction)
+            .setSilent(true)
+            .build()
+
+        notificationManager.notify(1, notification)
     }
 
     fun cancelNotification() {

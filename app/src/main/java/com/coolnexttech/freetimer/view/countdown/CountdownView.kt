@@ -9,17 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,13 +37,10 @@ import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.extension.findActivity
 import com.coolnexttech.freetimer.extension.hideNavBar
 import com.coolnexttech.freetimer.extension.hideSystemBar
+import com.coolnexttech.freetimer.model.CountDownControllerData
+import com.coolnexttech.freetimer.model.CountdownController
 import com.coolnexttech.freetimer.model.CountdownData
-import com.coolnexttech.freetimer.model.NotificationData
-import com.coolnexttech.freetimer.model.play
-import com.coolnexttech.freetimer.model.togglePlayButton
-import com.coolnexttech.freetimer.notification.CountdownNotificationService
 import com.coolnexttech.freetimer.ui.component.RoundedBox
-import com.coolnexttech.freetimer.ui.theme.PrimaryColor
 import com.coolnexttech.freetimer.ui.theme.TertiaryColor
 import com.coolnexttech.freetimer.viewmodel.CountdownViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -57,23 +49,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun CountDownView(navController: NavHostController, viewModel: CountdownViewModel) {
     val context: Context = LocalContext.current
 
-    val countdownNotificationService = CountdownNotificationService(context)
     val countdownData by viewModel.countdownData.collectAsState()
-    val play by play.collectAsState()
+    val countDownControllerData by CountdownController.data.collectAsState()
+    val dimScreen by viewModel.dimScreen.collectAsState()
 
-    val playAndPauseButtonIconId: Int = if (!play) {
-        R.drawable.ic_play
-    } else {
-        R.drawable.ic_pause
-    }
-
-    val timeLeft: String = if (countdownData.isRestModeActive) {
-        stringResource(id = R.string.count_down_screen_rest_duration_info_text) + countdownData.restDuration
-    } else {
-        stringResource(id = R.string.count_down_screen_work_duration_info_text) + countdownData.workDuration
-    }
     var showCancelCountdownAlert by remember { mutableStateOf(false) }
-    var dimScreen by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
 
     BackHandler {
@@ -85,82 +65,34 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     }
 
     if (countdownData.isWorkoutFinished()) {
-        finishCountdown(navController, countdownNotificationService)
+        navController.popBackStack()
     }
 
     if (showCancelCountdownAlert) {
         CancelCountdownAlertDialog(cancelCountdown = {
             showCancelCountdownAlert = false
-            finishCountdown(navController, countdownNotificationService)
+            navController.popBackStack()
         }, dismiss = {
             showCancelCountdownAlert = false
         })
     }
 
     if (dimScreen) {
-        BlackScreen {
-            dimScreen = false
-        }
+        BlackScreen(viewModel)
     } else {
-        CountDownViewState(timeLeft, countdownData, play, playAndPauseButtonIconId) {
-            dimScreen = true
-        }
+        CountDownViewState(context, viewModel, countdownData, countDownControllerData)
     }
 
     systemUiController.hideSystemBar(dimScreen)
     context.findActivity().hideNavBar(dimScreen)
-
-    countdownNotificationService.showNotification(
-        getNotificationData(
-            context,
-            dimScreen,
-            play,
-            timeLeft,
-            playAndPauseButtonIconId,
-            countdownData
-        )
-    )
-}
-
-private fun getNotificationData(
-    context: Context,
-    dimScreen: Boolean,
-    play: Boolean,
-    timeLeft: String,
-    playAndPauseButtonIconId: Int,
-    countdownData: CountdownData
-): NotificationData {
-    val setCountInfo =
-        context.getString(R.string.count_down_screen_set_count_info_text) + countdownData.setCount.toString()
-    val notificationIconId = if (dimScreen) {
-        R.drawable.ic_circle
-    } else {
-        R.drawable.ic_timer
-    }
-    val actionTitle: String = context.getString(
-        if (!play) {
-            R.string.count_down_screen_notification_resume_action_title
-        } else {
-            R.string.count_down_screen_notification_pause_action_title
-        }
-    )
-
-    return NotificationData(
-        setCountInfo,
-        timeLeft,
-        notificationIconId,
-        playAndPauseButtonIconId,
-        actionTitle
-    )
 }
 
 @Composable
 private fun CountDownViewState(
-    timeLeft: String,
+    context: Context,
+    viewModel: CountdownViewModel,
     countdownData: CountdownData,
-    play: Boolean,
-    playAndPauseButtonIconId: Int,
-    lockScreen: () -> Unit
+    countDownControllerData: CountDownControllerData
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -168,18 +100,18 @@ private fun CountDownViewState(
     ) {
         Spacer(modifier = Modifier.weight(1f))
         InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
-        InfoText(text = timeLeft)
+        InfoText(text = countdownData.getTimeLeftInfo(context))
         Row {
-            IconButton(onClick = { togglePlayButton(!play) }) {
+            IconButton(onClick = { CountdownController.toggle() }) {
                 Icon(
-                    painter = painterResource(id = playAndPauseButtonIconId),
+                    painter = painterResource(id = countDownControllerData.controlButtonIconId),
                     tint = TertiaryColor,
                     modifier = Modifier.size(48.dp),
                     contentDescription = "Play and Pause",
                 )
             }
             Spacer(modifier = Modifier.width(20.dp))
-            IconButton(onClick = { lockScreen() }) {
+            IconButton(onClick = { viewModel.dimScreen(true) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_sleep),
                     tint = TertiaryColor,
@@ -205,12 +137,12 @@ private fun InfoText(text: String) {
 }
 
 @Composable
-private fun BlackScreen(unlockScreen: () -> Unit) {
+private fun BlackScreen(viewModel: CountdownViewModel) {
     Box(modifier = Modifier
         .background(Color.Black)
         .fillMaxSize()
         .clickable {
-            unlockScreen()
+            viewModel.dimScreen(false)
         }) {}
 }
 
@@ -235,12 +167,4 @@ private fun CancelCountdownAlertDialog(cancelCountdown: () -> Unit, dismiss: () 
             )
         }
     })
-}
-
-private fun finishCountdown(
-    navController: NavHostController,
-    notificationManager: CountdownNotificationService
-) {
-    notificationManager.cancelNotification()
-    navController.popBackStack()
 }
