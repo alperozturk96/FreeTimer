@@ -1,6 +1,8 @@
 package com.coolnexttech.freetimer.view.countdown
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -90,13 +92,23 @@ private fun CountDownViewState(
     countdownData: CountdownData,
     countDownControllerData: CountDownControllerData
 ) {
+    val isCountdownStarted by viewModel.isCountdownStarted.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))
         InfoText(text = stringResource(id = R.string.count_down_screen_set_count_info_text) + countdownData.setCount)
-        InfoText(text = countdownData.getTimeLeftInfo(context))
+        InfoText(
+            text = if (isCountdownStarted) {
+                countdownData.getTimeLeftInfo(context)
+            } else {
+                stringResource(
+                    id = R.string.count_down_screen_ready_info_text
+                )
+            }
+        )
         Row {
             IconButton(onClick = { CountdownController.toggle() }) {
                 Icon(

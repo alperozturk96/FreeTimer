@@ -17,6 +17,7 @@
     <!-- CountDownView -->
     <string name="count_down_screen_set_count_info_text">SET\u0020</string>
     <string name="count_down_screen_work_duration_info_text">Time Left:\u0020</string>
+    <string name="count_down_screen_ready_info_text">Be Ready</string>
     <string name="count_down_screen_rest_duration_info_text">Rest:\u0020</string>
     <string name="count_down_screen_switch_text">Dim Screen</string>
     <string name="count_down_screen_cancel_countdown_alert_title">Do you want to cancel countdown?</string>

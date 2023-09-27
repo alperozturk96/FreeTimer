@@ -24,6 +24,9 @@ class CountdownViewModel: ViewModel() {
     private var _countdownData = MutableStateFlow(CountdownData())
     val countdownData: StateFlow<CountdownData> = _countdownData
 
+    private var _isCountdownStarted = MutableStateFlow(false)
+    val isCountdownStarted: StateFlow<Boolean> = _isCountdownStarted
+
     private var _dimScreen = MutableStateFlow(false)
     val dimScreen: StateFlow<Boolean> = _dimScreen
 
@@ -70,6 +73,12 @@ class CountdownViewModel: ViewModel() {
                 updateNotification(context)
 
                 delay(1000)
+
+                if (!_isCountdownStarted.value) {
+                    _isCountdownStarted.update {
+                        true
+                    }
+                }
             }
 
             println("Job is done")
