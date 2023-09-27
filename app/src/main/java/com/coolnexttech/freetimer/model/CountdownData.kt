@@ -9,6 +9,9 @@ import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.google.gson.Gson
 import java.util.UUID
 
+private var initialWorkoutDuration = 0
+private var initialRestDuration = 0
+
 @Entity
 data class CountdownData(
     @PrimaryKey var id: UUID = UUID.randomUUID(),
@@ -25,6 +28,11 @@ data class CountdownData(
         println("Countdown Set: $setCount")
         println("Countdown WorkDuration: $workDuration")
         println("Countdown RestDuration: $restDuration")
+    }
+
+    fun setInitialDurations(data: CountdownData) {
+        initialWorkoutDuration = data.workDuration
+        initialRestDuration = data.restDuration
     }
 
     fun getTimeLeftInfo(context: Context): String {
@@ -52,7 +60,7 @@ data class CountdownData(
     }
 
     fun isWorkoutFinished(): Boolean {
-        return setCount == 0
+        return setCount == 1 && workDuration == 0
     }
 }
 
@@ -61,9 +69,7 @@ fun CountdownData.toJson(): String {
 }
 
 fun CountdownData.startCountDown(
-    mediaPlayerManager: MediaPlayerManager,
-    initialWorkoutDuration: Int,
-    initialRestDuration: Int
+    mediaPlayerManager: MediaPlayerManager
 ): CountdownData {
     val updatedVal = this.copy()
 
@@ -83,10 +89,6 @@ fun CountdownData.startCountDown(
             }
 
             mediaPlayerManager.playAudio(R.raw.boxing_bell)
-        }
-
-        if (updatedVal.isWorkoutFinished()) {
-            mediaPlayerManager.stopAudio()
         }
     } else {
         updatedVal.apply {

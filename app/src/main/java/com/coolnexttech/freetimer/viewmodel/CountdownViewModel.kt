@@ -1,8 +1,11 @@
 package com.coolnexttech.freetimer.viewmodel
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.coolnexttech.freetimer.R
 import com.coolnexttech.freetimer.manager.MediaPlayerManager
 import com.coolnexttech.freetimer.model.CountdownController
@@ -24,29 +27,24 @@ class CountdownViewModel: ViewModel() {
     private var _dimScreen = MutableStateFlow(false)
     val dimScreen: StateFlow<Boolean> = _dimScreen
 
-    private var initialWorkoutDuration = 0
-    private var initialRestDuration = 0
-
     private var updateNotificationForPauseMode = true
 
     private var countdownNotificationService: CountdownNotificationService? = null
 
-    fun init(context: Context) {
+    fun init(context: Context, navController: NavHostController) {
         val mediaPlayerManager = MediaPlayerManager(context)
-        startCountDown(mediaPlayerManager, context)
+        startCountDown(mediaPlayerManager, context, navController)
         countdownNotificationService = CountdownNotificationService(context)
     }
 
     fun setupCountdownData(data: CountdownData) {
-        initialWorkoutDuration = data.workDuration
-        initialRestDuration = data.restDuration
-
         _countdownData.update {
+            it.setInitialDurations(it)
             data
         }
     }
 
-    private fun startCountDown(mediaPlayerManager: MediaPlayerManager, context: Context) {
+    private fun startCountDown(mediaPlayerManager: MediaPlayerManager, context: Context, navController: NavHostController) {
         viewModelScope.launch(Dispatchers.Main) {
             while (!_countdownData.value.isWorkoutFinished()) {
                 if (!CountdownController.data.value.resume) {
@@ -62,11 +60,7 @@ class CountdownViewModel: ViewModel() {
                 println("CountDown Started Running")
 
                 _countdownData.update {
-                    it.startCountDown(
-                        mediaPlayerManager,
-                        initialWorkoutDuration,
-                        initialRestDuration
-                    )
+                    it.startCountDown(mediaPlayerManager)
                 }
 
                 if (!updateNotificationForPauseMode) {
@@ -79,6 +73,8 @@ class CountdownViewModel: ViewModel() {
             }
 
             println("Job is done")
+
+            finishCountdown(navController, mediaPlayerManager)
         }
     }
 
@@ -86,6 +82,14 @@ class CountdownViewModel: ViewModel() {
         _dimScreen.update {
             value
         }
+    }
+
+    private fun finishCountdown(navController: NavHostController, mediaPlayerManager: MediaPlayerManager) {
+        navController.popBackStack()
+        mediaPlayerManager.playAudio(R.raw.finish_boxing_bell)
+        Handler(Looper.getMainLooper()).postDelayed({
+            mediaPlayerManager.stopAudio()
+        }, 5000)
     }
 
     private fun updateNotification(context: Context) {

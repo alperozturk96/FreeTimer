@@ -61,11 +61,7 @@ fun CountDownView(navController: NavHostController, viewModel: CountdownViewMode
     }
 
     LaunchedEffect(true) {
-        viewModel.init(context)
-    }
-
-    if (countdownData.isWorkoutFinished()) {
-        navController.popBackStack()
+        viewModel.init(context, navController)
     }
 
     if (showCancelCountdownAlert) {
